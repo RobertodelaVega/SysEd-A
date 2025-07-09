@@ -13,6 +13,8 @@ function JS_List_Jump(){
 	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
 }
 
+
+
 function loadObjectPages(url, target) {
 	if (searchObject(url) == false) {
 		alert(properties[selectedLangTag]['wp_objectNotExported']);
@@ -31,6 +33,7 @@ function loadObjectPages(url, target) {
 	}		
 		
 }
+
 function loadModelPages(url, target) {
 	if (searchModel(url) == false) {
 		alert(properties[selectedLangTag]['wp_modelNotExported']);
@@ -49,22 +52,23 @@ function loadModelPages(url, target) {
 	}		
 		
 }
-</script>
 
+</script>
 </head>
 <body  bgcolor='#FFFFFF'>
 
-<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_model']);</script></p>
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_object']);</script></p>
 
 <div id="auswahl"><font face="Arial">
 	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
-	<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
-	<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
-        <option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
-	<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
-	<option value="#Objects"><script>document.write(properties[selectedLangTag]['wp_objects']);</script></option>
-	<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
-        <option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+		<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+		<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+		<option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+		<option value="#Occurrences"><script>document.write(properties[selectedLangTag]['wp_occurrences']);</script></option>
+		<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+		<option value="#Relationships"><script>document.write(properties[selectedLangTag]['wp_relationships']);</script></option>
+		<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+		<option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
         </td></tr></table></form></font>
 </div>
 
@@ -86,11 +90,11 @@ function loadModelPages(url, target) {
 </tr>
 <tr>
 	<td>Name</td>
-	<td>uno</td>
+	<td>Evento</td>
 </tr>
 <tr>
 	<td>Time of generation</td>
-	<td>09-jul-2025 10:04:20</td>
+	<td>09-jul-2025 17:53:11</td>
 </tr>
 <ARIS LIST>
 
@@ -100,33 +104,34 @@ function loadModelPages(url, target) {
 
 </table>
 
-<ARIS MOD_INF_FEEDBACK>
+<ARIS OBJ_INF_FEEDBACK>
 <ARIS OBJ_INF_HIERARCHY>
 <table class="dataTable">
 <tr>
-	<th colspan="2"><a name="Objects"></a>&nbsp;<b><script>document.write(properties['es']['wp_objects']);</script></b></th>
+	<th colspan="2"><a name="Occurrences"></a>&nbsp;<b><script>document.write(properties['es']['wp_occurrences']);</script></b></th>
 </tr>
 <tr>
-	<td>Event</td>
-	<td><a href="o9e8012d4-5ccd-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evento</a></td>
-</tr>
-<tr>
-	<td>Event</td>
-	<td><a href="o9e8012d0-5ccd-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evento</a></td>
-</tr>
-<tr>
-	<td>Function</td>
-	<td><a href="o9e8012d2-5ccd-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Función</a></td>
+	<td>EPC</td>
+	<td><a href="m9c0045c0-5ccd-11f0-24ea-5cb47e4f1a87_nav.htm" target="model">uno</a></td>
 </tr>
 <ARIS LIST>
 
+</table>
 
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Relationships"></a>&nbsp;<b><script>document.write(properties['es']['wp_relationships']);</script></b></th>
+</tr>
+<tr>
+	<td>is created by</td>
+	<td><a href="javascript:loadObjectPages('o9e8012d2-5ccd-11f0-24ea-5cb47e4f1a87', 'info')">Función</a></td>
+</tr>
+<ARIS LIST>
 
 </table>
 
-<ARIS MOD_INF_MASTER>
-<ARIS MOD_INF_VARIANTS>
+<ARIS OBJ_INF_MASTER>
+<ARIS OBJ_INF_VARIANTS>
 
 </body>
 </html>
-
