@@ -1,0 +1,462 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Publicador Académico</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<script src="properties.js"></script>
+	<script src="exportedObjects.js"></script>
+	<script src="exportedModels.js"></script>
+<script>
+var selectedLangTag = "es";
+
+function JS_List_Jump(){
+	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
+}
+
+function loadObjectPages(url, target) {
+	if (searchObject(url) == false) {
+		alert(properties[selectedLangTag]['wp_objectNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+function loadModelPages(url, target) {
+	if (searchModel(url) == false) {
+		alert(properties[selectedLangTag]['wp_modelNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+</script>
+
+</head>
+<body  bgcolor='#FFFFFF'>
+
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_model']);</script></p>
+
+<div id="auswahl"><font face="Arial">
+	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
+	<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+	<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+        <option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+	<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+	<option value="#Objects"><script>document.write(properties[selectedLangTag]['wp_objects']);</script></option>
+	<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+        <option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+        </td></tr></table></form></font>
+</div>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Attributes"></a>&nbsp;<b><script>document.write(properties['es']['wp_attributes']);</script></b></th>
+</tr>
+<tr>
+	<td>Creator</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Last change</td>
+	<td>10-jul-2025 12:50:06</td>
+</tr>
+<tr>
+	<td>Last user</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>Gantt1</td>
+</tr>
+<tr>
+	<td>Time of generation</td>
+	<td>06-jun-2025 8:03:37</td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_FEEDBACK>
+<ARIS OBJ_INF_HIERARCHY>
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Objects"></a>&nbsp;<b><script>document.write(properties['es']['wp_objects']);</script></b></th>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o61ecf224-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">1</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o61ecf226-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">2</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a309-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Actualizar curriculo</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a301-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Actualizar programa de estudio</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d548cab-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Ajustar plan de prospecciones</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Caracterizar estudiante</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Caracterizar estudiante</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a303-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Cerrar programa de estudio</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa85392b5-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Consolidar información</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d548cb1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Construir FODA planes vigentes</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="obb96fa6f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Crear  propuesta</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a307-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Crear perfil de egreso</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa8054e0-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Crear programa de estudio</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a312-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Desarrollar prospección</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d548cb7-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Estudiar pertinencia TDR</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa8539294-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evaluar  avances  consultoría</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa853929e-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evaluar informe final</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a328-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evaluar plan de estudio vigente</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="obb96fa75-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evaluar propuesta</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d548cae-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evento</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oa85392b3-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evento</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="obb96fa8d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evento</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d546592-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Evento</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oa8539291-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Feedback  entregado consultoría Prospección</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a30d-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Función</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o61ecf220-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Función</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="obb96fa8a-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Gestionar contrato</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d54659a-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Hacer plan  prospección  diseño  curricular</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d548ca8-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">información  referencial  entregada</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oa85392b9-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">información analizada</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oa85392a6-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Informe final  evaluación  del plan de estudio</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oa85392a4-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Informe integrado prospección  educacional entregado</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o5d9270d9-456f-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Informes finales entregables publicados</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o5d9270d6-456f-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">informes parciales publicados</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d548ca1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Kickoff presentado</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa85392b0-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Levantar  información  (Fuentes institución)</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d548ca5-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Preparar información  referencial  para estudio</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a31c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">preparar prospección</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d54659c-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Preparar Kickoff</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="obb96fa72-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Propuesta  entregada</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="obb96fa78-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Propuesta adjudicada</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="obb96fa7b-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Propuesta informada</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oa85392a1-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Publicación en  plataforma colaborativa</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa853929b-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Publicar avances parciales en plataforma colaborativa</a></td>
+</tr>
+<tr>
+	<td>Position</td>
+	<td><a href="o61ecf222-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Puesto</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="oaa80a316-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Quality gate</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa85392bc-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar  informe</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a322-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar  prospección educacional</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a32c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar acciones de  aprendizaje</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a30b-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar actualización instruccional</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oa85392bf-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar comentarios  y avances</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o8d546590-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar diagnóstico y  propuesta  curricular</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="obb96fa82-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar inducción</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oaa80a31f-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar prospección  laboral</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="obb96fa8f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Realizar control y  seguimiento  de consultoría</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="obb96fa61-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla O</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="o8d548cbe-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla O</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="o5d91fba0-456f-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla O exclusivo</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="oaa80a324-452c-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla Y</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="o8d548cb3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla Y</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="oa8539296-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla Y</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="oa85392a8-4568-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla Y</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="obb96fa85-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla Y</a></td>
+</tr>
+<tr>
+	<td>Rule</td>
+	<td><a href="obb96fa7d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Regla Y</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="obb96fa68-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Revisar  TDR</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="obb96fa6c-4566-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">TDR ajustado entregado</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d548cba-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">TDR de  prospección  laboral generado</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d548cc3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">TDR para  evaluar plan  de estudio vigente  y perfil de  egreso generado</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o8d548cbc-4564-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">TDR prospección  educacional  generado</a></td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_MASTER>
+<ARIS MOD_INF_VARIANTS>
+
+</body>
+</html>
+

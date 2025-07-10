@@ -1,0 +1,222 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Publicador Académico</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<script src="properties.js"></script>
+	<script src="exportedObjects.js"></script>
+	<script src="exportedModels.js"></script>
+<script>
+var selectedLangTag = "es";
+
+function JS_List_Jump(){
+	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
+}
+
+function loadObjectPages(url, target) {
+	if (searchObject(url) == false) {
+		alert(properties[selectedLangTag]['wp_objectNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+function loadModelPages(url, target) {
+	if (searchModel(url) == false) {
+		alert(properties[selectedLangTag]['wp_modelNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+</script>
+
+</head>
+<body  bgcolor='#FFFFFF'>
+
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_model']);</script></p>
+
+<div id="auswahl"><font face="Arial">
+	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
+	<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+	<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+        <option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+	<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+	<option value="#Objects"><script>document.write(properties[selectedLangTag]['wp_objects']);</script></option>
+	<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+        <option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+        </td></tr></table></form></font>
+</div>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Attributes"></a>&nbsp;<b><script>document.write(properties['es']['wp_attributes']);</script></b></th>
+</tr>
+<tr>
+	<td>Creator</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Last change</td>
+	<td>28-abr-2025 12:19:20</td>
+</tr>
+<tr>
+	<td>Last user</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>EPC vra</td>
+</tr>
+<tr>
+	<td>Time of generation</td>
+	<td>28-abr-2025 8:22:44</td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_FEEDBACK>
+<ARIS OBJ_INF_HIERARCHY>
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Objects"></a>&nbsp;<b><script>document.write(properties['es']['wp_objects']);</script></b></th>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o97f45056-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">cerrar sesion</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o97f4507e-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">completar</a></td>
+</tr>
+<tr>
+	<td>Cluster/Data model</td>
+	<td><a href="o97f4506b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">data alignment</a></td>
+</tr>
+<tr>
+	<td>Cluster/Data model</td>
+	<td><a href="o97f4506f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">data metacognitivo</a></td>
+</tr>
+<tr>
+	<td>Cluster/Data model</td>
+	<td><a href="o97f45065-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">data sincronización aprendizaje</a></td>
+</tr>
+<tr>
+	<td>Cluster/Data model</td>
+	<td><a href="o97f4506d-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">data sistema causal</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o97f45080-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">debatir</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o97f45054-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">desarrollar sesión</a></td>
+</tr>
+<tr>
+	<td>Application system type</td>
+	<td><a href="o97f4505f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Diseño curricular</a></td>
+</tr>
+<tr>
+	<td>Position</td>
+	<td><a href="o97f45068-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">docente</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o97f45074-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">estudiante</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o937fa962-2431-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">exponer</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o84385a1c-2429-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">fecha sesión  habilitada</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o84385a21-2429-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Formación diocente</a></td>
+</tr>
+<tr>
+	<td>Application system</td>
+	<td><a href="o97f45052-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">KINRO</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o97f45079-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">orientar</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o84385a1e-2429-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">preparar inicio sesión</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o937fa968-2431-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">recibir feedback</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o97f4505c-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Resultado aprendizaje logrado</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o937fa960-2431-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">sesión  terminada</a></td>
+</tr>
+<tr>
+	<td>Event</td>
+	<td><a href="o97f4507b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" target="info">Sesión iniciada</a></td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_MASTER>
+<ARIS MOD_INF_VARIANTS>
+
+</body>
+</html>
+

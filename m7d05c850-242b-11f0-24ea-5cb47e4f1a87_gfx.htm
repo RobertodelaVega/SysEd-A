@@ -1,0 +1,1128 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Publicador Académico</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<link rel="STYLESHEET"  href="CascadeMenu.css">
+	
+	
+
+
+<style type=text/css>
+
+@media screen{ 
+	
+	#print {
+		display:none;
+		
+	}
+	
+		
+}
+ 
+@media print {
+	
+	#imageDiv {
+		display:none;
+		
+	}
+	#modLinks {
+		display:none;
+	}
+	#screen {
+		display:none;
+	}
+
+	
+}
+
+
+
+
+</style>
+
+<script src="zoom.js"></script>
+<script src='helper.js'></script>
+<script src="properties.js"></script>
+<script src="exportedModels.js"></script>
+
+<script src="tree_logic.js"></script>
+
+
+
+<script>
+
+var selectedLangTag = "es";
+var menu = 'general';
+var objMenu = 'obj';
+var hasToHide = 'true';
+var hasToShowModelInfo = 'true';
+var menuArray = new Array();
+var objMenuArray = new Array();
+var index = 0;
+var modIndex = 0;
+var newPage = true;
+
+function setAssignForMenu(p_menuEntra) {
+	menuArray[index] = p_menuEntra; 
+	index = index + 1;
+}
+
+function setObjForMenu(p_menuEntra) {
+	objMenuArray[modIndex] = p_menuEntra; 
+	modIndex = modIndex + 1;
+}
+
+
+var divMenu = null;
+function showContextMenu(p_objectID){
+
+	if ((parent.info != null) && (parent.info != undefined)) {
+	
+		// bring element visible to ensure its initialized
+		if (document.getElementById) {
+			divMenu = document.getElementById(p_objectID);
+		}
+		else if (document.all) {
+			divMenu = document.all(p_objectID);
+		}
+		else if (document.layers) {
+			divMenu = document.layers(p_objectID);
+		}
+		divMenu.style.left = -1000;
+		divMenu.style.top = -1000;
+		divMenu.style.display = '';
+		divMenu.style.position = 'absolute';
+		var mouse = null;
+		if (isNN) {
+			mouse = getMousePointInWindow(popupEvent);
+		}
+		else {
+			mouse = getMousePointInWindow();
+		}
+				
+		var mx = mouse.getX() - 5;
+    	var my = mouse.getY() - 5;
+
+    	var obj = getObjectBounds(p_objectID);
+    	var wnd = getVisibleRectOfWindow();
+
+    	//correct x:
+    	var scrollWidth = 20; // width of the scrollbar
+    	if((mx + obj.width + scrollWidth)  > wnd.right) {
+        	mx -= (mx + obj.width + scrollWidth) - wnd.right;
+    	}
+
+    	//correct y:
+    	if((my + obj.height + scrollWidth) > wnd.bottom) {
+        	my -= (my + obj.height + scrollWidth) - wnd.bottom;
+    	}
+
+    	// set to final position
+    	divMenu.style.left = mx;
+    	divMenu.style.top = my;
+	}
+	
+}
+
+function closeContextMenu(p_objectID) {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+    	var div = document.getElementById(p_objectID);
+    	if (div != null) {
+    		div.style.display = 'none';
+    	}
+}
+
+function loadPages(url, menuid) {
+	if (url == 'null') {
+		showContextMenu(menuid);
+	}
+	else if (searchModel(url) == false) {
+	}
+        else if (opener != null) {
+		closeContextMenu(menuid);
+		opener.parent.info.location.href=url + "_inf.htm";
+		opener.parent.data.location.href=url + "_gfx.htm";
+		opener.parent.model.location.href=url + "_nav.htm";		
+		opener.focus();				
+	} else {
+		top.info.location.href=url + "_inf.htm";
+		top.data.location.href=url + "_gfx.htm";
+		top.model.location.href=url + "_nav.htm";
+	}
+}
+
+function loadObjectPage(url, menuid) {
+	newPage = false;
+	if (opener != null) {
+		closeContextMenu(menuid);
+		opener.parent.info.location.href=url + "_inf.htm";
+		opener.focus();				
+	} else {	
+		top.info.location.href=url + "_inf.htm";
+	}
+}
+
+function loadModelPage(url, menuid) {
+	if (hasToShowModelInfo == 'true') { 
+		if (opener != null) {
+			opener.parent.info.location.href=url + "_inf.htm";
+			opener.focus();				
+		} else {	
+			top.info.location.href=url + "_inf.htm";
+		}
+	}
+}
+
+
+var zoom = new zoomManager("m7d05c850-242b-11f0-24ea-5cb47e4f1a87", new Array("25","50","100","125"), "2");
+
+function ZoomOut() {
+	zoom.zoomOut();
+}
+
+function ZoomIn() {
+	zoom.zoomIn();
+}
+
+function ZoomOrig() {
+	zoom.zoomOrig();
+}
+
+function ZoomOptimalSize() {
+	zoom.doOptimalZoom(document.body.clientHeight, document.body.clientWidth, document.getElementById('zoomFunctions'));
+}
+
+function Zoom(code, submenu) {
+	document.getElementById(submenu).style.visibility = "hidden";
+	if (code == 0) {
+		ZoomIn();
+	}
+	else if (code == 1) {
+		ZoomOut();
+	}
+	else if (code == 2) {
+		ZoomOrig();
+	}
+	else if (code == 3) {
+		ZoomOptimalSize();
+	}
+}
+
+
+function Print(singlePage, submenu) {
+
+	document.getElementById(submenu).style.visibility = "hidden";
+
+	var zoomFactor = zoom.getZoomValue();
+
+	var constPageHeight = 842;
+	var constPageWidth = 595;
+	var constDoubleMargin = 136;
+	var constFullPageHeight = constPageHeight + constDoubleMargin;
+	var constFullPageWidth = constPageWidth  + 54;
+	var imageHeight = document.getElementById("m7d05c850-242b-11f0-24ea-5cb47e4f1a87").offsetHeight;
+	var imageWidth = document.getElementById("m7d05c850-242b-11f0-24ea-5cb47e4f1a87").offsetWidth;
+	var heightSteps = Math.ceil(imageHeight/constPageHeight);
+	var widthSteps = Math.ceil(imageWidth/constPageWidth);
+	var constFullPageHeightStep = constFullPageHeight * heightSteps;
+	var i = 0;
+	var j = 0;
+	
+	var div = document.getElementById('print');
+
+	removeAllChildren(div);
+
+	var hCorr = constFullPageHeight/imageHeight;
+	var wCorr = constFullPageWidth/imageWidth;
+	
+	if ((imageHeight <= constPageHeight) && (imageWidth <= constPageWidth)) {
+			var p = document.createElement('p');
+			p.innerHTML = '<img id=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87\"src=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"width='+imageWidth+'; height='+imageHeight+';\"></img>';		
+			div.appendChild(p);
+		}
+
+	else if (singlePage) {
+			if (hCorr < wCorr) {
+				var p = document.createElement('p');
+				var h = imageHeight * hCorr;
+				var w = imageWidth * hCorr;
+				p.innerHTML = '<img id=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87\"src=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"width='+w+'; height='+h+';\"></img>';		
+				div.appendChild(p);
+			}
+			else {
+				var p = document.createElement('p');
+				var h = imageHeight * wCorr;
+				var w = imageWidth * wCorr;
+				p.innerHTML = '<img id=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87\"src=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"width='+w+'; height='+h+';\"></img>';		
+				div.appendChild(p);
+			}
+		
+	}
+	else {	
+		while(i < widthSteps) {
+			while(j < heightSteps) {
+				var p = document.createElement('p');
+				if (isIE) {
+					p.style.setAttribute('position', 'static');
+					p.style.setAttribute('page-break-after', '');
+				}
+				else {
+					p.setAttribute('style', 'position:static');
+					p.setAttribute('style', "page-break-after:''");
+				}
+				p.innerHTML = '<img id=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87\"src=\"m7d05c850-242b-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"position:absolute; top:'+i*constFullPageHeightStep+' px; left:-'+i*constFullPageWidth+' px; overflow:hidden;clip:rect('+j*constPageHeight+' px,  '+(i+1)*constFullPageWidth +' px,  '+(j+1)*constPageHeight+' px,  '+i*constFullPageWidth+' px )\"></img>';		
+				div.appendChild(p);
+				j=j+1;
+				
+			}
+			j=0;
+			i=i+1;
+		}
+	}
+	
+	top.data.focus();
+	window.print();
+	
+}
+
+function removeAllChildren(targetElement) {
+    if (targetElement && targetElement.childNodes) {
+        for (var rloop = targetElement.childNodes.length -1; rloop >= 0 ; rloop--) {
+            targetElement.removeChild(targetElement.childNodes[rloop]);
+        }
+    }
+}
+
+function showOverviewIfNeeded() {
+	if ((parent.frames["tree"] != "undefined") && (parent.frames["tree"] != null))	{
+		var treeTab = parent.frames["tree"].document.getElementById("treeTab");	
+		if (treeTab.className == "tabinactive") {
+			var overview = parent.frames["tree"].document.getElementById("overviewTab");	
+    			if (overview.style.display == '') {
+				setOverview();
+			}
+		}
+	}
+}
+
+function setOverview() {
+	var id = zoom.getId();
+	var img = parent.data.document.getElementById(id);
+	if (img != null) {
+		parent.frames["tree"].showOverview(false);
+  	}
+	else {
+      		setTimeout("setOverview()", 100);
+	}
+
+}
+
+function keyPressed (e) {
+  	if (!e) {
+    		e = window.event;
+	}
+  	if (e.which) {
+    		kCode = e.which;
+  	} 	
+	else if (e.keyCode) {
+    		kCode = e.keyCode;
+  	}
+	if (kCode == 43) {
+		ZoomIn();
+	}
+	else if (kCode == 45) {
+		ZoomOut();
+	}
+	else if (kCode == 42) {
+		ZoomOrig();
+	}
+  	
+}
+
+document.onkeypress = keyPressed;
+
+isIE=document.all;
+isNN=!document.all&&document.getElementById;
+isN4=document.layers;
+
+
+if (isIE||isNN){
+document.oncontextmenu=showPopup;
+document.onclick=hidePopup;
+}else{
+document.captureEvents(Event.MOUSEDOWN || Event.MOUSEUP);
+document.onmousedown=showPopup;
+document.onclick=hidePopup;
+}
+
+var popupEvent = null;
+
+function showPopup(e) {
+	if (isNN) {
+	
+		popupEvent = e;
+	}
+
+	hidePopup(2);
+	showContextMenu(menu);
+	return false;
+/*
+if (isN4){
+if (e.which==2||e.which==3){
+    hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+}else {
+    hidePopup(2);
+return false;
+}
+}else{
+    //hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+
+}
+*/
+}
+
+function showPopup2(e){
+if (isN4){
+if (e.which==2||e.which==3){
+	hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+}else {
+	hidePopup(2);
+return false;
+}
+}else{
+	hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+
+}
+}
+
+function hidePopup(e) {
+	var ret = false;
+    	if (hasToHide == 'true') {
+		document.getElementById('printFunctions').style.visibility = "hidden";
+		document.getElementById('zoomFunctions').style.visibility = "hidden";
+		if (isN4){
+			if (e.which==1){
+				closeContextMenu(menu);
+    				closeContextMenu(objMenu);
+				for (var i = 0; i < menuArray.length; i++) {
+					closeContextMenu(menuArray[i]);
+				}
+    				for (var i = 0; i < objMenuArray.length; i++) {
+					closeContextMenu(objMenuArray[i]);
+				}
+				ret = newPage;
+				newPage = true;  
+				return ret;
+			}else {
+				closeContextMenu(menu);
+    				closeContextMenu(objMenu);
+				for (var i = 0; i < menuArray.length; i++) {
+					closeContextMenu(menuArray[i]);
+				}
+    				for (var i = 0; i < objMenuArray.length; i++) {
+					closeContextMenu(objMenuArray[i]);
+				}
+				ret = newPage;
+				newPage = true;  
+				return ret;
+			}
+		}
+		else{
+			closeContextMenu(menu);
+    			closeContextMenu(objMenu);
+			for (var i = 0; i < menuArray.length; i++) {
+				closeContextMenu(menuArray[i]);
+			}
+    			for (var i = 0; i < objMenuArray.length; i++) {
+				closeContextMenu(objMenuArray[i]);
+			}
+			ret = newPage;
+			newPage = true;  
+			return ret;
+
+		}
+	}
+	else {
+		setHasToHide('true') ;
+		ret = newPage;
+			newPage = true;  
+			return ret;
+	}
+}
+
+function setMenu(p_menu) {
+	menu = p_menu;
+}
+
+function setObjMenu(p_menu) {
+	objMenu = p_menu;
+}
+
+function setHasToHide(p_hide) {
+	hasToHide = p_hide;
+}
+
+function setModelInfoToShow(p_modInfo) {
+	hasToShowModelInfo = p_modInfo;
+}
+
+function frameScroll() {
+	var wnd = getVisibleRectOfWindow();
+	parent.tree.setRectPositionAfterModelScroll(wnd.x, wnd.y);
+}
+
+function ShowSubMenu(obj, menu) {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+	
+	if (menu == 'zoom') {
+		menu = document.getElementById('zoomFunctions');
+	}
+	else {
+		menu = document.getElementById('printFunctions');
+	}
+	
+	if(menu != null) {
+		if (isIE) {
+			menu.style.visibility = "visible";
+			menu.style.pixelTop = obj.getBoundingClientRect().top + document.body.scrollTop; 
+			menu.style.pixelLeft = divMenu.style.pixelLeft + divMenu.offsetWidth -5;
+			
+			var x = menu.style.pixelLeft + menu.offsetWidth;
+			if(x > document.body.clientWidth + document.body.scrollLeft) {
+				menu.style.pixelLeft = divMenu.style.pixelLeft - menu.offsetWidth+5;
+			}
+		}
+		else {
+			menu.style.visibility = "visible";
+			if (obj.getBoundingClientRect) {
+				menu.style.top = obj.getBoundingClientRect().top + document.body.scrollTop;
+			}
+			else {
+				menu.style.top = document.getBoxObjectFor(obj).y + document.documentElement.scrollTop;
+			}
+			menu.style.left = parseInt(divMenu.style.left) + divMenu.offsetWidth -5;// + document.body.scrollLeft;
+			var x = menu.style.left + menu.offsetWidth;
+			// muss noch korrigiert werden!!!
+			if(x > parseInt(document.body.clientWidth + document.body.scrollLeft)) {
+				menu.style.left = parseInt(divMenu.style.left) - menu.offsetWidth+5;// + document.body.scrollLeft;
+			}
+		}
+    }
+	
+}
+
+function hidePrintFunctions() {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+}
+
+function hideZoomFunctions() {
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+}
+
+function showPrintFunctions() {
+	document.getElementById('printFunctions').style.visibility = "visible";
+}
+
+function showZoomFunctions() {
+	document.getElementById('zoomFunctions').style.visibility = "visible";
+}
+
+
+function setHighlightForArrow1() {
+	document.getElementById('arrowSign1').style.backgroundColor = "#EFECE6";
+	document.getElementById('zoomMenu').style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForArrow1() {
+	document.getElementById('arrowSign1').style.backgroundColor = "#FFFFFF";
+	document.getElementById('zoomMenu').style.backgroundColor = "#FFFFFF";
+}
+
+function setHighlightForArrow2() {
+	document.getElementById('arrowSign2').style.backgroundColor = "#EFECE6";
+	document.getElementById('printMenu').style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForArrow2() {
+	document.getElementById('arrowSign2').style.backgroundColor = "#FFFFFF";
+	document.getElementById('printMenu').style.backgroundColor = "#FFFFFF";
+}
+
+function setHighlightForLinks(id1, id2) {
+	document.getElementById(id1).style.backgroundColor = "#EFECE6";
+	document.getElementById(id2).style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForLinks(id1, id2) {
+	document.getElementById(id1).style.backgroundColor = "#FFFFFF";
+	document.getElementById(id2).style.backgroundColor = "#FFFFFF";
+}
+
+
+
+</script>		
+</head>
+
+<body onLoad='javascript: showOverviewIfNeeded();' onscroll="javascript:frameScroll();">
+
+
+   
+<div id="screen" class="data">
+
+<div id="general" class="menu" style="display:none;"><table width="110%"><tr><td id='zoomMenu' menu="zoomFunctions" onmouseout="this.className=''; setNoHighlightForArrow1(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'zoom'); setHighlightForArrow1()" ><script>document.write(properties[selectedLangTag]['wp_view']);</script></td><td id='arrowSign1' menu="zoomFunctions" onmouseout="this.className=''; setNoHighlightForArrow1(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'zoom'); setHighlightForArrow1()"><Span>&#9654</Span></td></tr><tr><td id='printMenu' menu="printFunctions" onmouseout="this.className=''; setNoHighlightForArrow2(); hidePrintFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'print'); setHighlightForArrow2()" ><script>document.write(properties[selectedLangTag]['wp_print']);</script></td><td id='arrowSign2' menu="printFunctions" onmouseout="this.className=''; setNoHighlightForArrow2(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'print'); setHighlightForArrow2()"><Span>&#9654</Span></td></tr></table></div><div id="occ_obj0" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj0')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o937fa968-2431-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj1" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj1')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o937fa962-2431-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj2" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj2')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o937fa960-2431-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj3" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj3')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45080-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj4" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj4')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4507e-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj5" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj5')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4507b-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj6" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj6')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45079-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj7" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj7')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45074-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj8" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj8')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4506f-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj9" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj9')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4506d-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj10" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj10')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4506b-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj11" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj11')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45068-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj12" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj12')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45065-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj13" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj13')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4505f-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj14" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj14')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f4505c-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj15" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj15')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45056-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj16" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj16')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45054-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj17" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj17')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o97f45052-242b-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj18" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj18')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o84385a21-2429-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj19" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj19')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o84385a1e-2429-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj20" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj20')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o84385a1c-2429-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div>
+
+
+<div>  
+	<map name="ObjectMap25">
+	<area shape="rect" coords="204,215,235,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa968-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa968-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: recibir
+feedback
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="164,215,195,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa962-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa962-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: exponer
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="244,215,275,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa960-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa960-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: sesión 
+terminada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="124,215,155,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45080-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45080-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: debatir
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="84,215,115,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507e-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507e-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: completar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="9,215,40,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Sesión
+iniciada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="44,215,75,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45079-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45079-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: orientar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="111,139,148,151" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45074-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45074-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: estudiante
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="244,25,275,44" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data metacognitivo
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="209,25,240,44" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506d-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506d-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sistema causal
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="174,25,205,44" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data alignment
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="26,109,63,121" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45068-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45068-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: docente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="189,55,230,64" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45065-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45065-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sincronización aprendizaje
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="69,130,100,149" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Diseño
+curricular
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="194,75,225,94" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505c-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505c-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Resultado
+aprendizaje
+logrado
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="154,75,185,94" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45056-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45056-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: cerrar
+sesion
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="114,75,145,94" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45054-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45054-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: desarrollar
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="114,111,145,130" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45052-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45052-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: KINRO
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="14,30,85,49" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a21-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a21-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Formación
+diocente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="74,75,105,94" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1e-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1e-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar -
+inicio
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="34,75,65,94" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1c-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1c-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: fecha
+sesión 
+habilitada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap50">
+	<area shape="rect" coords="409,430,471,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa968-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa968-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: recibir
+feedback
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="329,430,391,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa962-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa962-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: exponer
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="488,430,550,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa960-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa960-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: sesión 
+terminada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="249,430,311,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45080-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45080-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: debatir
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="169,430,231,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507e-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507e-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: completar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="19,430,81,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Sesión
+iniciada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="89,430,151,469" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45079-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45079-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: orientar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="223,278,298,302" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45074-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45074-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: estudiante
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="489,51,551,90" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data metacognitivo
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="419,51,481,90" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506d-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506d-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sistema causal
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="349,51,411,90" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data alignment
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="53,218,128,242" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45068-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45068-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: docente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="379,111,461,130" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45065-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45065-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sincronización aprendizaje
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="139,260,201,299" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Diseño
+curricular
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="388,150,450,189" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505c-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505c-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Resultado
+aprendizaje
+logrado
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="309,151,371,190" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45056-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45056-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: cerrar
+sesion
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="229,151,291,190" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45054-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45054-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: desarrollar
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="229,221,291,258" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45052-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45052-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: KINRO
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="29,61,171,100" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a21-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a21-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Formación
+diocente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="149,151,211,190" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1e-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1e-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar -
+inicio
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="69,150,131,189" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1c-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1c-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: fecha
+sesión 
+habilitada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap100">
+	<area shape="rect" coords="817,861,941,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa968-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa968-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: recibir
+feedback
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="657,861,781,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa962-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa962-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: exponer
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="977,861,1102,939" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa960-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa960-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: sesión 
+terminada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="498,861,622,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45080-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45080-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: debatir
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="338,861,462,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507e-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507e-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: completar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="38,861,163,939" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Sesión
+iniciada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="178,861,302,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45079-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45079-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: orientar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="445,556,594,603" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45074-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45074-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: estudiante
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="977,101,1101,179" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data metacognitivo
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="837,101,961,179" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506d-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506d-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sistema causal
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="697,101,821,179" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data alignment
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="106,436,255,484" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45068-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45068-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: docente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="757,221,921,259" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45065-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45065-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sincronización aprendizaje
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="278,521,402,599" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Diseño
+curricular
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="777,301,902,379" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505c-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505c-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Resultado
+aprendizaje
+logrado
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="618,301,742,378" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45056-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45056-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: cerrar
+sesion
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="458,301,582,378" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45054-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45054-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: desarrollar
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="457,442,582,517" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45052-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45052-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: KINRO
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="58,121,343,199" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a21-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a21-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Formación
+diocente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="298,301,422,378" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1e-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1e-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar -
+inicio
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="137,301,262,379" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1c-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1c-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: fecha
+sesión 
+habilitada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap125">
+	<area shape="rect" coords="1022,1076,1177,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa968-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa968-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: recibir
+feedback
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="822,1076,977,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa962-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa962-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: exponer
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="1221,1076,1377,1173" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o937fa960-2431-11f0-24ea-5cb47e4f1a87', 'general')"href="o937fa960-2431-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: sesión 
+terminada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="622,1076,777,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45080-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45080-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: debatir
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="422,1076,577,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507e-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507e-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: completar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="47,1076,203,1173" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4507b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4507b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Sesión
+iniciada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="222,1076,377,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45079-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45079-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: orientar
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="557,695,743,754" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45074-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45074-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: estudiante
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="1222,126,1377,223" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data metacognitivo
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="1047,126,1202,223" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506d-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506d-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sistema causal
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="872,126,1027,223" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4506b-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4506b-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data alignment
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="132,545,318,605" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45068-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45068-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: docente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="947,276,1152,323" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45065-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45065-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: data sincronización aprendizaje
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="347,651,502,748" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505f-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505f-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Diseño
+curricular
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="971,376,1127,473" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f4505c-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f4505c-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Resultado
+aprendizaje
+logrado
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="772,377,927,473" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45056-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45056-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: cerrar
+sesion
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="572,377,727,473" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45054-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45054-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: desarrollar
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="572,553,728,646" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o97f45052-242b-11f0-24ea-5cb47e4f1a87', 'general')"href="o97f45052-242b-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: KINRO
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="72,151,428,248" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a21-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a21-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Formación
+diocente
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="372,377,527,473" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1e-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1e-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar -
+inicio
+sesión
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+<area shape="rect" coords="172,376,328,473" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o84385a1c-2429-11f0-24ea-5cb47e4f1a87', 'general')"href="o84385a1c-2429-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: fecha
+sesión 
+habilitada
+Time of generation: 28-abr-2025 12:19:20
+Last change: 28-abr-2025 12:19:20
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+
+
+
+
+
+</div>
+
+<div id="printFunctions" class="menu" style="visibility:hidden; left:-1000; top: -1000"> 
+	<table width="120%">
+    	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showPrintFunctions()" onclick="Print(false, 'printFunctions')"><script>document.write(properties[selectedLangTag]['wp_standard_print']);</script></td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showPrintFunctions()"" onclick="Print(true, 'printFunctions')"><script>document.write(properties[selectedLangTag]['wp_page_print']);</script> </td>
+    	</tr>
+        </table>
+</div>
+
+<div id="zoomFunctions" class="menu" style="visibility:hidden; left:-1000; top: -1000"> 
+	<table width="120%">
+    	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(0, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomin']);</script></td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(1, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomout']);</script> </td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(2, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomhund']);</script> </td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(3, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomopt']);</script> </td>
+    	</tr>
+        </table>
+</div>
+
+
+
+
+<div class="doc" id="imageDiv" > 
+<img id="m7d05c850-242b-11f0-24ea-5cb47e4f1a87" src="m7d05c850-242b-11f0-24ea-5cb47e4f1a87_100.png" onclick="loadModelPage('m7d05c850-242b-11f0-24ea-5cb47e4f1a87', 'general')" usemap="#ObjectMap100"></img>
+
+</div>
+
+</div>
+
+<div id="modLinks" class="doc"> 
+<MODEL LINKS>
+</div>
+
+<div id="print" >
+</div>
+
+</body>
+</html>

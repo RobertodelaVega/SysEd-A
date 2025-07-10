@@ -1,0 +1,2356 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Publicador Académico</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<link rel="STYLESHEET"  href="CascadeMenu.css">
+	
+	
+
+
+<style type=text/css>
+
+@media screen{ 
+	
+	#print {
+		display:none;
+		
+	}
+	
+		
+}
+ 
+@media print {
+	
+	#imageDiv {
+		display:none;
+		
+	}
+	#modLinks {
+		display:none;
+	}
+	#screen {
+		display:none;
+	}
+
+	
+}
+
+
+
+
+</style>
+
+<script src="zoom.js"></script>
+<script src='helper.js'></script>
+<script src="properties.js"></script>
+<script src="exportedModels.js"></script>
+
+<script src="tree_logic.js"></script>
+
+
+
+<script>
+
+var selectedLangTag = "es";
+var menu = 'general';
+var objMenu = 'obj';
+var hasToHide = 'true';
+var hasToShowModelInfo = 'true';
+var menuArray = new Array();
+var objMenuArray = new Array();
+var index = 0;
+var modIndex = 0;
+var newPage = true;
+
+function setAssignForMenu(p_menuEntra) {
+	menuArray[index] = p_menuEntra; 
+	index = index + 1;
+}
+
+function setObjForMenu(p_menuEntra) {
+	objMenuArray[modIndex] = p_menuEntra; 
+	modIndex = modIndex + 1;
+}
+
+
+var divMenu = null;
+function showContextMenu(p_objectID){
+
+	if ((parent.info != null) && (parent.info != undefined)) {
+	
+		// bring element visible to ensure its initialized
+		if (document.getElementById) {
+			divMenu = document.getElementById(p_objectID);
+		}
+		else if (document.all) {
+			divMenu = document.all(p_objectID);
+		}
+		else if (document.layers) {
+			divMenu = document.layers(p_objectID);
+		}
+		divMenu.style.left = -1000;
+		divMenu.style.top = -1000;
+		divMenu.style.display = '';
+		divMenu.style.position = 'absolute';
+		var mouse = null;
+		if (isNN) {
+			mouse = getMousePointInWindow(popupEvent);
+		}
+		else {
+			mouse = getMousePointInWindow();
+		}
+				
+		var mx = mouse.getX() - 5;
+    	var my = mouse.getY() - 5;
+
+    	var obj = getObjectBounds(p_objectID);
+    	var wnd = getVisibleRectOfWindow();
+
+    	//correct x:
+    	var scrollWidth = 20; // width of the scrollbar
+    	if((mx + obj.width + scrollWidth)  > wnd.right) {
+        	mx -= (mx + obj.width + scrollWidth) - wnd.right;
+    	}
+
+    	//correct y:
+    	if((my + obj.height + scrollWidth) > wnd.bottom) {
+        	my -= (my + obj.height + scrollWidth) - wnd.bottom;
+    	}
+
+    	// set to final position
+    	divMenu.style.left = mx;
+    	divMenu.style.top = my;
+	}
+	
+}
+
+function closeContextMenu(p_objectID) {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+    	var div = document.getElementById(p_objectID);
+    	if (div != null) {
+    		div.style.display = 'none';
+    	}
+}
+
+function loadPages(url, menuid) {
+	if (url == 'null') {
+		showContextMenu(menuid);
+	}
+	else if (searchModel(url) == false) {
+	}
+        else if (opener != null) {
+		closeContextMenu(menuid);
+		opener.parent.info.location.href=url + "_inf.htm";
+		opener.parent.data.location.href=url + "_gfx.htm";
+		opener.parent.model.location.href=url + "_nav.htm";		
+		opener.focus();				
+	} else {
+		top.info.location.href=url + "_inf.htm";
+		top.data.location.href=url + "_gfx.htm";
+		top.model.location.href=url + "_nav.htm";
+	}
+}
+
+function loadObjectPage(url, menuid) {
+	newPage = false;
+	if (opener != null) {
+		closeContextMenu(menuid);
+		opener.parent.info.location.href=url + "_inf.htm";
+		opener.focus();				
+	} else {	
+		top.info.location.href=url + "_inf.htm";
+	}
+}
+
+function loadModelPage(url, menuid) {
+	if (hasToShowModelInfo == 'true') { 
+		if (opener != null) {
+			opener.parent.info.location.href=url + "_inf.htm";
+			opener.focus();				
+		} else {	
+			top.info.location.href=url + "_inf.htm";
+		}
+	}
+}
+
+
+var zoom = new zoomManager("m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87", new Array("25","50","100","125"), "2");
+
+function ZoomOut() {
+	zoom.zoomOut();
+}
+
+function ZoomIn() {
+	zoom.zoomIn();
+}
+
+function ZoomOrig() {
+	zoom.zoomOrig();
+}
+
+function ZoomOptimalSize() {
+	zoom.doOptimalZoom(document.body.clientHeight, document.body.clientWidth, document.getElementById('zoomFunctions'));
+}
+
+function Zoom(code, submenu) {
+	document.getElementById(submenu).style.visibility = "hidden";
+	if (code == 0) {
+		ZoomIn();
+	}
+	else if (code == 1) {
+		ZoomOut();
+	}
+	else if (code == 2) {
+		ZoomOrig();
+	}
+	else if (code == 3) {
+		ZoomOptimalSize();
+	}
+}
+
+
+function Print(singlePage, submenu) {
+
+	document.getElementById(submenu).style.visibility = "hidden";
+
+	var zoomFactor = zoom.getZoomValue();
+
+	var constPageHeight = 842;
+	var constPageWidth = 595;
+	var constDoubleMargin = 136;
+	var constFullPageHeight = constPageHeight + constDoubleMargin;
+	var constFullPageWidth = constPageWidth  + 54;
+	var imageHeight = document.getElementById("m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87").offsetHeight;
+	var imageWidth = document.getElementById("m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87").offsetWidth;
+	var heightSteps = Math.ceil(imageHeight/constPageHeight);
+	var widthSteps = Math.ceil(imageWidth/constPageWidth);
+	var constFullPageHeightStep = constFullPageHeight * heightSteps;
+	var i = 0;
+	var j = 0;
+	
+	var div = document.getElementById('print');
+
+	removeAllChildren(div);
+
+	var hCorr = constFullPageHeight/imageHeight;
+	var wCorr = constFullPageWidth/imageWidth;
+	
+	if ((imageHeight <= constPageHeight) && (imageWidth <= constPageWidth)) {
+			var p = document.createElement('p');
+			p.innerHTML = '<img id=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87\"src=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"width='+imageWidth+'; height='+imageHeight+';\"></img>';		
+			div.appendChild(p);
+		}
+
+	else if (singlePage) {
+			if (hCorr < wCorr) {
+				var p = document.createElement('p');
+				var h = imageHeight * hCorr;
+				var w = imageWidth * hCorr;
+				p.innerHTML = '<img id=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87\"src=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"width='+w+'; height='+h+';\"></img>';		
+				div.appendChild(p);
+			}
+			else {
+				var p = document.createElement('p');
+				var h = imageHeight * wCorr;
+				var w = imageWidth * wCorr;
+				p.innerHTML = '<img id=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87\"src=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"width='+w+'; height='+h+';\"></img>';		
+				div.appendChild(p);
+			}
+		
+	}
+	else {	
+		while(i < widthSteps) {
+			while(j < heightSteps) {
+				var p = document.createElement('p');
+				if (isIE) {
+					p.style.setAttribute('position', 'static');
+					p.style.setAttribute('page-break-after', '');
+				}
+				else {
+					p.setAttribute('style', 'position:static');
+					p.setAttribute('style', "page-break-after:''");
+				}
+				p.innerHTML = '<img id=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87\"src=\"m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87_'+zoomFactor+'.png\" style=\"position:absolute; top:'+i*constFullPageHeightStep+' px; left:-'+i*constFullPageWidth+' px; overflow:hidden;clip:rect('+j*constPageHeight+' px,  '+(i+1)*constFullPageWidth +' px,  '+(j+1)*constPageHeight+' px,  '+i*constFullPageWidth+' px )\"></img>';		
+				div.appendChild(p);
+				j=j+1;
+				
+			}
+			j=0;
+			i=i+1;
+		}
+	}
+	
+	top.data.focus();
+	window.print();
+	
+}
+
+function removeAllChildren(targetElement) {
+    if (targetElement && targetElement.childNodes) {
+        for (var rloop = targetElement.childNodes.length -1; rloop >= 0 ; rloop--) {
+            targetElement.removeChild(targetElement.childNodes[rloop]);
+        }
+    }
+}
+
+function showOverviewIfNeeded() {
+	if ((parent.frames["tree"] != "undefined") && (parent.frames["tree"] != null))	{
+		var treeTab = parent.frames["tree"].document.getElementById("treeTab");	
+		if (treeTab.className == "tabinactive") {
+			var overview = parent.frames["tree"].document.getElementById("overviewTab");	
+    			if (overview.style.display == '') {
+				setOverview();
+			}
+		}
+	}
+}
+
+function setOverview() {
+	var id = zoom.getId();
+	var img = parent.data.document.getElementById(id);
+	if (img != null) {
+		parent.frames["tree"].showOverview(false);
+  	}
+	else {
+      		setTimeout("setOverview()", 100);
+	}
+
+}
+
+function keyPressed (e) {
+  	if (!e) {
+    		e = window.event;
+	}
+  	if (e.which) {
+    		kCode = e.which;
+  	} 	
+	else if (e.keyCode) {
+    		kCode = e.keyCode;
+  	}
+	if (kCode == 43) {
+		ZoomIn();
+	}
+	else if (kCode == 45) {
+		ZoomOut();
+	}
+	else if (kCode == 42) {
+		ZoomOrig();
+	}
+  	
+}
+
+document.onkeypress = keyPressed;
+
+isIE=document.all;
+isNN=!document.all&&document.getElementById;
+isN4=document.layers;
+
+
+if (isIE||isNN){
+document.oncontextmenu=showPopup;
+document.onclick=hidePopup;
+}else{
+document.captureEvents(Event.MOUSEDOWN || Event.MOUSEUP);
+document.onmousedown=showPopup;
+document.onclick=hidePopup;
+}
+
+var popupEvent = null;
+
+function showPopup(e) {
+	if (isNN) {
+	
+		popupEvent = e;
+	}
+
+	hidePopup(2);
+	showContextMenu(menu);
+	return false;
+/*
+if (isN4){
+if (e.which==2||e.which==3){
+    hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+}else {
+    hidePopup(2);
+return false;
+}
+}else{
+    //hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+
+}
+*/
+}
+
+function showPopup2(e){
+if (isN4){
+if (e.which==2||e.which==3){
+	hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+}else {
+	hidePopup(2);
+return false;
+}
+}else{
+	hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+
+}
+}
+
+function hidePopup(e) {
+	var ret = false;
+    	if (hasToHide == 'true') {
+		document.getElementById('printFunctions').style.visibility = "hidden";
+		document.getElementById('zoomFunctions').style.visibility = "hidden";
+		if (isN4){
+			if (e.which==1){
+				closeContextMenu(menu);
+    				closeContextMenu(objMenu);
+				for (var i = 0; i < menuArray.length; i++) {
+					closeContextMenu(menuArray[i]);
+				}
+    				for (var i = 0; i < objMenuArray.length; i++) {
+					closeContextMenu(objMenuArray[i]);
+				}
+				ret = newPage;
+				newPage = true;  
+				return ret;
+			}else {
+				closeContextMenu(menu);
+    				closeContextMenu(objMenu);
+				for (var i = 0; i < menuArray.length; i++) {
+					closeContextMenu(menuArray[i]);
+				}
+    				for (var i = 0; i < objMenuArray.length; i++) {
+					closeContextMenu(objMenuArray[i]);
+				}
+				ret = newPage;
+				newPage = true;  
+				return ret;
+			}
+		}
+		else{
+			closeContextMenu(menu);
+    			closeContextMenu(objMenu);
+			for (var i = 0; i < menuArray.length; i++) {
+				closeContextMenu(menuArray[i]);
+			}
+    			for (var i = 0; i < objMenuArray.length; i++) {
+				closeContextMenu(objMenuArray[i]);
+			}
+			ret = newPage;
+			newPage = true;  
+			return ret;
+
+		}
+	}
+	else {
+		setHasToHide('true') ;
+		ret = newPage;
+			newPage = true;  
+			return ret;
+	}
+}
+
+function setMenu(p_menu) {
+	menu = p_menu;
+}
+
+function setObjMenu(p_menu) {
+	objMenu = p_menu;
+}
+
+function setHasToHide(p_hide) {
+	hasToHide = p_hide;
+}
+
+function setModelInfoToShow(p_modInfo) {
+	hasToShowModelInfo = p_modInfo;
+}
+
+function frameScroll() {
+	var wnd = getVisibleRectOfWindow();
+	parent.tree.setRectPositionAfterModelScroll(wnd.x, wnd.y);
+}
+
+function ShowSubMenu(obj, menu) {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+	
+	if (menu == 'zoom') {
+		menu = document.getElementById('zoomFunctions');
+	}
+	else {
+		menu = document.getElementById('printFunctions');
+	}
+	
+	if(menu != null) {
+		if (isIE) {
+			menu.style.visibility = "visible";
+			menu.style.pixelTop = obj.getBoundingClientRect().top + document.body.scrollTop; 
+			menu.style.pixelLeft = divMenu.style.pixelLeft + divMenu.offsetWidth -5;
+			
+			var x = menu.style.pixelLeft + menu.offsetWidth;
+			if(x > document.body.clientWidth + document.body.scrollLeft) {
+				menu.style.pixelLeft = divMenu.style.pixelLeft - menu.offsetWidth+5;
+			}
+		}
+		else {
+			menu.style.visibility = "visible";
+			if (obj.getBoundingClientRect) {
+				menu.style.top = obj.getBoundingClientRect().top + document.body.scrollTop;
+			}
+			else {
+				menu.style.top = document.getBoxObjectFor(obj).y + document.documentElement.scrollTop;
+			}
+			menu.style.left = parseInt(divMenu.style.left) + divMenu.offsetWidth -5;// + document.body.scrollLeft;
+			var x = menu.style.left + menu.offsetWidth;
+			// muss noch korrigiert werden!!!
+			if(x > parseInt(document.body.clientWidth + document.body.scrollLeft)) {
+				menu.style.left = parseInt(divMenu.style.left) - menu.offsetWidth+5;// + document.body.scrollLeft;
+			}
+		}
+    }
+	
+}
+
+function hidePrintFunctions() {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+}
+
+function hideZoomFunctions() {
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+}
+
+function showPrintFunctions() {
+	document.getElementById('printFunctions').style.visibility = "visible";
+}
+
+function showZoomFunctions() {
+	document.getElementById('zoomFunctions').style.visibility = "visible";
+}
+
+
+function setHighlightForArrow1() {
+	document.getElementById('arrowSign1').style.backgroundColor = "#EFECE6";
+	document.getElementById('zoomMenu').style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForArrow1() {
+	document.getElementById('arrowSign1').style.backgroundColor = "#FFFFFF";
+	document.getElementById('zoomMenu').style.backgroundColor = "#FFFFFF";
+}
+
+function setHighlightForArrow2() {
+	document.getElementById('arrowSign2').style.backgroundColor = "#EFECE6";
+	document.getElementById('printMenu').style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForArrow2() {
+	document.getElementById('arrowSign2').style.backgroundColor = "#FFFFFF";
+	document.getElementById('printMenu').style.backgroundColor = "#FFFFFF";
+}
+
+function setHighlightForLinks(id1, id2) {
+	document.getElementById(id1).style.backgroundColor = "#EFECE6";
+	document.getElementById(id2).style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForLinks(id1, id2) {
+	document.getElementById(id1).style.backgroundColor = "#FFFFFF";
+	document.getElementById(id2).style.backgroundColor = "#FFFFFF";
+}
+
+
+
+</script>		
+</head>
+
+<body onLoad='javascript: showOverviewIfNeeded();' onscroll="javascript:frameScroll();">
+
+
+   
+<div id="screen" class="data">
+
+<div id="general" class="menu" style="display:none;"><table width="110%"><tr><td id='zoomMenu' menu="zoomFunctions" onmouseout="this.className=''; setNoHighlightForArrow1(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'zoom'); setHighlightForArrow1()" ><script>document.write(properties[selectedLangTag]['wp_view']);</script></td><td id='arrowSign1' menu="zoomFunctions" onmouseout="this.className=''; setNoHighlightForArrow1(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'zoom'); setHighlightForArrow1()"><Span>&#9654</Span></td></tr><tr><td id='printMenu' menu="printFunctions" onmouseout="this.className=''; setNoHighlightForArrow2(); hidePrintFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'print'); setHighlightForArrow2()" ><script>document.write(properties[selectedLangTag]['wp_print']);</script></td><td id='arrowSign2' menu="printFunctions" onmouseout="this.className=''; setNoHighlightForArrow2(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'print'); setHighlightForArrow2()"><Span>&#9654</Span></td></tr></table></div><div id="occ_obj0" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj0')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o5d9270d9-456f-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj1" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj1')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o5d9270d6-456f-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj2" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj2')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o5d91fba0-456f-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj3" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj3')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392bf-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj4" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj4')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392bc-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj5" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj5')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392b9-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj6" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj6')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392b5-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj7" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj7')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392b3-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj8" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj8')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392b0-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj9" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj9')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj10" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj10')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392a8-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj11" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj11')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392a6-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj12" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj12')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392a4-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj13" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj13')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa85392a1-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj14" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj14')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa853929e-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj15" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj15')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa853929b-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj16" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj16')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa8539296-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj17" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj17')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa8539294-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj18" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj18')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa8539291-4568-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj19" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj19')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa8f-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj20" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj20')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa8d-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj21" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj21')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa8a-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj22" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj22')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa85-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj23" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj23')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa82-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj24" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj24')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa7d-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj25" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj25')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa7b-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj26" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj26')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa78-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj27" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj27')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa75-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj28" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj28')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa72-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj29" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj29')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa6f-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj30" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj30')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa6c-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj31" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj31')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa68-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj32" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj32')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obb96fa61-4566-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj33" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj33')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cc3-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj34" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj34')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cbe-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj35" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj35')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cbc-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj36" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj36')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cba-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj37" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj37')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cb7-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj38" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj38')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cb3-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj39" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj39')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cb1-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj40" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj40')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cae-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj41" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj41')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548cab-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj42" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj42')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548ca8-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj43" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj43')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548ca5-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj44" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj44')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d548ca1-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj45" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj45')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d54659c-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj46" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj46')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d54659a-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj47" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj47')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d546592-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj48" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj48')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8d546590-4564-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj49" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj49')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a32c-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj50" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj50')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj51" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj51')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a328-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj52" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj52')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a324-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj53" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj53')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a322-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj54" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj54')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a31f-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj55" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj55')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a31c-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj56" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj56')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a316-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj57" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj57')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a312-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj58" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj58')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a30d-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj59" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj59')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a30b-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj60" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj60')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a309-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj61" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj61')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a307-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj62" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj62')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a303-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj63" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj63')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa80a301-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj64" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj64')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oaa8054e0-452c-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj65" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj65')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o61ecf226-42ce-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj66" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj66')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o61ecf224-42ce-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj67" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj67')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o61ecf222-42ce-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj68" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj68')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o61ecf220-42ce-11f0-24ea-5cb47e4f1a87', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div>
+
+
+<div>  
+	<map name="ObjectMap25">
+	<area shape="rect" coords="302,238,333,257" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d9-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d9-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informes
+finales
+entregables
+publicados
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="441,310,472,329" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d6-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d6-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: informes
+parciales
+publicados
+Time of generation: 09-jun-2025 16:22:55
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="377,291,387,301" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d91fba0-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d91fba0-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O exclusivo
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="393,307,424,326" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bf-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bf-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+comentarios 
+y avances
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="257,257,288,276" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bc-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bc-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+informe
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="344,287,375,306" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b9-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b9-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información
+analizada
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="306,287,337,306" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b5-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b5-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Consolidar
+información
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="257,287,288,306" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b3-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b3-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="207,287,238,306" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b0-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b0-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Levantar 
+información 
+(Fuentes institución)
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="183,248,214,266" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1199,183,1209,193" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a8-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a8-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:11:17
+Last change: 09-jun-2025 16:11:25
+"/>
+<area shape="rect" coords="1221,243,1252,262" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a6-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a6-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe final 
+evaluación  del
+plan de estudio
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="1221,215,1252,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a4-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a4-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe integrado
+prospección 
+educacional
+entregado
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="1221,179,1252,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a1-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a1-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicación en 
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:04:50
+Last change: 09-jun-2025 16:04:50
+"/>
+<area shape="rect" coords="1146,179,1177,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929e-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929e-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+informe
+final
+Time of generation: 09-jun-2025 16:03:11
+Last change: 10-jul-2025 12:47:47
+"/>
+<area shape="rect" coords="1097,179,1128,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929b-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929b-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicar
+avances
+parciales en
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="992,183,1002,193" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539296-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539296-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:01:39
+Last change: 09-jun-2025 16:01:45
+"/>
+<area shape="rect" coords="1011,211,1042,230" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539294-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539294-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar 
+avances 
+consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="1051,179,1082,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539291-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539291-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Feedback 
+entregado
+consultoría
+Prospección
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:06:21
+"/>
+<area shape="rect" coords="1011,179,1042,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar control y 
+seguimiento 
+de consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="954,179,985,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="912,211,943,230" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8a-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8a-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Gestionar
+contrato
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="891,183,901,193" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa85-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa85-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:30:49
+Last change: 09-jun-2025 15:30:55
+"/>
+<area shape="rect" coords="912,179,943,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa82-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa82-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+inducción
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="831,183,841,193" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:29:25
+Last change: 09-jun-2025 15:29:32
+"/>
+<area shape="rect" coords="849,211,880,230" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7b-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7b-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+informada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="849,179,880,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa78-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa78-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+adjudicada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="788,179,819,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa75-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa75-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="748,179,779,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa72-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa72-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="702,179,733,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear 
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="660,179,691,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6c-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6c-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR ajustado
+entregado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="603,179,634,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa68-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa68-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Revisar 
+TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="560,183,570,193" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa61-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa61-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="518,211,549,230" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj33'); setObjMenu('occ_obj33')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cc3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cc3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR para 
+evaluar plan 
+de estudio vigente 
+y perfil de 
+egreso generado
+Time of generation: 09-jun-2025 15:20:37
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="495,183,505,193" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj34'); setObjMenu('occ_obj34')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbe-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbe-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 15:18:31
+Last change: 09-jun-2025 15:18:37
+"/>
+<area shape="rect" coords="518,179,549,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj35'); setObjMenu('occ_obj35')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbc-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbc-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR prospección 
+educacional 
+generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="518,146,549,165" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj36'); setObjMenu('occ_obj36')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cba-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cba-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR de 
+prospección
+ laboral generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="455,179,486,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj37'); setObjMenu('occ_obj37')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb7-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb7-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Estudiar
+pertinencia TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="440,220,450,230" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj38'); setObjMenu('occ_obj38')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:15:12
+Last change: 09-jun-2025 15:15:18
+"/>
+<area shape="rect" coords="455,243,486,262" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj39'); setObjMenu('occ_obj39')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Construir FODA
+planes vigentes
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="403,215,434,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj40'); setObjMenu('occ_obj40')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cae-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cae-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="356,215,387,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj41'); setObjMenu('occ_obj41')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cab-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cab-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Ajustar plan de
+prospecciones
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="316,215,347,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj42'); setObjMenu('occ_obj42')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca8-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca8-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información 
+referencial 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="269,215,300,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj43'); setObjMenu('occ_obj43')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca5-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca5-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar
+información 
+referencial 
+para estudio
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="228,215,259,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj44'); setObjMenu('occ_obj44')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Kickoff
+presentado
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="183,215,214,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj45'); setObjMenu('occ_obj45')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659c-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659c-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar Kickoff
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="96,215,127,234" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj46'); setObjMenu('occ_obj46')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659a-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659a-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Hacer plan 
+prospección 
+diseño 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="234,115,263,133" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj47'); setObjMenu('occ_obj47')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546592-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546592-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="282,115,313,133" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj48'); setObjMenu('occ_obj48')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546590-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546590-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+diagnóstico y 
+propuesta 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="183,180,214,198" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj49'); setObjMenu('occ_obj49')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+acciones de 
+aprendizaje
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="183,69,214,87" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj50'); setObjMenu('occ_obj50')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="183,137,214,155" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj51'); setObjMenu('occ_obj51')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a328-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a328-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+plan de estudio
+vigente
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="155,98,164,107" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj52'); setObjMenu('occ_obj52')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a324-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a324-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:02:30
+Last change: 09-jun-2025 15:02:39
+"/>
+<area shape="rect" coords="183,115,214,133" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj53'); setObjMenu('occ_obj53')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a322-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a322-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+prospección
+educacional
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="183,93,214,111" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj54'); setObjMenu('occ_obj54')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31f-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31f-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+prospección 
+laboral
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="96,94,127,112" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj55'); setObjMenu('occ_obj55')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="107,32,132,50" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj56'); setObjMenu('occ_obj56')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a316-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a316-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Quality gate
+Time of generation: 09-jun-2025 14:13:58
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="96,64,150,82" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj57'); setObjMenu('occ_obj57')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a312-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a312-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Desarrollar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="121,441,152,460" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj58'); setObjMenu('occ_obj58')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30d-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30d-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="84,422,115,441" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj59'); setObjMenu('occ_obj59')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30b-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30b-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+actualización
+instruccional
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="84,395,115,414" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj60'); setObjMenu('occ_obj60')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a309-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a309-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar
+curriculo
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="22,395,53,414" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj61'); setObjMenu('occ_obj61')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a307-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a307-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear perfil de egreso
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="170,358,237,377" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj62'); setObjMenu('occ_obj62')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a303-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a303-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Cerrar programa de estudio
+Description/Definition: Término de un Programa por pérdida de pertinencia de acuerdo a la evaluación de la VRA
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="84,358,151,377" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj63'); setObjMenu('occ_obj63')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a301-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a301-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar programa de estudio
+Time of generation: 09-jun-2025 8:25:39
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="22,358,62,377" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj64'); setObjMenu('occ_obj64')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa8054e0-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa8054e0-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear programa de estudio
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="2073,363,2095,382" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj65'); setObjMenu('occ_obj65')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf226-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf226-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 2
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="1962,363,1989,382" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj66'); setObjMenu('occ_obj66')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf224-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf224-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 1
+Time of generation: 06-jun-2025 8:08:53
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="45,75,70,86" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj67'); setObjMenu('occ_obj67')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf222-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf222-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Puesto
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="1987,220,1998,239" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj68'); setObjMenu('occ_obj68')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf220-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf220-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap50">
+	<area shape="rect" coords="611,478,673,517" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d9-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d9-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informes
+finales
+entregables
+publicados
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="901,627,963,666" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d6-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d6-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: informes
+parciales
+publicados
+Time of generation: 09-jun-2025 16:22:55
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="768,588,788,608" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d91fba0-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d91fba0-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O exclusivo
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="801,623,863,662" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bf-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bf-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+comentarios 
+y avances
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="517,517,579,556" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bc-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bc-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+informe
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="700,579,762,618" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b9-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b9-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información
+analizada
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="620,579,682,618" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b5-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b5-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Consolidar
+información
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="517,579,579,618" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b3-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b3-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="414,579,476,618" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b0-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b0-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Levantar 
+información 
+(Fuentes institución)
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="362,499,424,536" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="2482,363,2502,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a8-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a8-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:11:17
+Last change: 09-jun-2025 16:11:25
+"/>
+<area shape="rect" coords="2529,488,2591,527" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a6-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a6-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe final 
+evaluación  del
+plan de estudio
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="2529,431,2591,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a4-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a4-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe integrado
+prospección 
+educacional
+entregado
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="2529,354,2591,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a1-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a1-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicación en 
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:04:50
+Last change: 09-jun-2025 16:04:50
+"/>
+<area shape="rect" coords="2374,354,2436,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929e-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929e-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+informe
+final
+Time of generation: 09-jun-2025 16:03:11
+Last change: 10-jul-2025 12:47:47
+"/>
+<area shape="rect" coords="2270,354,2332,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929b-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929b-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicar
+avances
+parciales en
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2051,363,2071,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539296-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539296-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:01:39
+Last change: 09-jun-2025 16:01:45
+"/>
+<area shape="rect" coords="2090,421,2152,460" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539294-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539294-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar 
+avances 
+consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="2174,354,2236,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539291-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539291-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Feedback 
+entregado
+consultoría
+Prospección
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:06:21
+"/>
+<area shape="rect" coords="2090,354,2152,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar control y 
+seguimiento 
+de consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1973,354,2035,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1884,421,1946,460" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8a-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8a-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Gestionar
+contrato
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1840,363,1860,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa85-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa85-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:30:49
+Last change: 09-jun-2025 15:30:55
+"/>
+<area shape="rect" coords="1884,354,1946,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa82-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa82-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+inducción
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1715,363,1735,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:29:25
+Last change: 09-jun-2025 15:29:32
+"/>
+<area shape="rect" coords="1752,421,1814,460" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7b-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7b-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+informada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1752,354,1814,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa78-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa78-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+adjudicada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1626,354,1688,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa75-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa75-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1541,354,1603,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa72-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa72-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1445,354,1507,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear 
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="1359,354,1421,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6c-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6c-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR ajustado
+entregado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1239,354,1301,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa68-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa68-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Revisar 
+TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="1149,363,1169,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa61-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa61-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1062,421,1124,460" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj33'); setObjMenu('occ_obj33')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cc3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cc3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR para 
+evaluar plan 
+de estudio vigente 
+y perfil de 
+egreso generado
+Time of generation: 09-jun-2025 15:20:37
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1015,363,1035,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj34'); setObjMenu('occ_obj34')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbe-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbe-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 15:18:31
+Last change: 09-jun-2025 15:18:37
+"/>
+<area shape="rect" coords="1062,354,1124,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj35'); setObjMenu('occ_obj35')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbc-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbc-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR prospección 
+educacional 
+generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1062,287,1124,326" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj36'); setObjMenu('occ_obj36')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cba-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cba-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR de 
+prospección
+ laboral generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="930,354,992,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj37'); setObjMenu('occ_obj37')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb7-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb7-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Estudiar
+pertinencia TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="900,440,920,460" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj38'); setObjMenu('occ_obj38')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:15:12
+Last change: 09-jun-2025 15:15:18
+"/>
+<area shape="rect" coords="930,488,992,527" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj39'); setObjMenu('occ_obj39')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Construir FODA
+planes vigentes
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="822,431,884,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj40'); setObjMenu('occ_obj40')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cae-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cae-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="723,431,785,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj41'); setObjMenu('occ_obj41')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cab-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cab-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Ajustar plan de
+prospecciones
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="640,431,702,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj42'); setObjMenu('occ_obj42')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca8-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca8-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información 
+referencial 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="543,431,605,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj43'); setObjMenu('occ_obj43')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca5-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca5-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar
+información 
+referencial 
+para estudio
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="457,431,519,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj44'); setObjMenu('occ_obj44')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Kickoff
+presentado
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="362,431,424,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj45'); setObjMenu('occ_obj45')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659c-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659c-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar Kickoff
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="182,431,244,470" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj46'); setObjMenu('occ_obj46')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659a-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659a-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Hacer plan 
+prospección 
+diseño 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="469,221,528,258" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj47'); setObjMenu('occ_obj47')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546592-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546592-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="569,221,631,257" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj48'); setObjMenu('occ_obj48')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546590-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546590-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+diagnóstico y 
+propuesta 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="362,357,424,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj49'); setObjMenu('occ_obj49')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+acciones de 
+aprendizaje
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="362,125,424,161" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj50'); setObjMenu('occ_obj50')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="362,267,424,303" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj51'); setObjMenu('occ_obj51')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a328-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a328-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+plan de estudio
+vigente
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="305,185,324,204" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj52'); setObjMenu('occ_obj52')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a324-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a324-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:02:30
+Last change: 09-jun-2025 15:02:39
+"/>
+<area shape="rect" coords="362,222,424,258" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj53'); setObjMenu('occ_obj53')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a322-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a322-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+prospección
+educacional
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="362,175,424,211" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj54'); setObjMenu('occ_obj54')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31f-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31f-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+prospección 
+laboral
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="182,177,244,213" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj55'); setObjMenu('occ_obj55')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="204,48,254,84" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj56'); setObjMenu('occ_obj56')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a316-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a316-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Quality gate
+Time of generation: 09-jun-2025 14:13:58
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="182,114,290,150" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj57'); setObjMenu('occ_obj57')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a312-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a312-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Desarrollar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="234,901,296,940" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj58'); setObjMenu('occ_obj58')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30d-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30d-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="156,862,218,901" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj59'); setObjMenu('occ_obj59')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30b-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30b-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+actualización
+instruccional
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="156,805,218,844" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj60'); setObjMenu('occ_obj60')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a309-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a309-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar
+curriculo
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="27,805,89,844" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj61'); setObjMenu('occ_obj61')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a307-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a307-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear perfil de egreso
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="337,728,471,767" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj62'); setObjMenu('occ_obj62')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a303-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a303-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Cerrar programa de estudio
+Description/Definition: Término de un Programa por pérdida de pertinencia de acuerdo a la evaluación de la VRA
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="156,728,290,767" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj63'); setObjMenu('occ_obj63')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a301-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a301-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar programa de estudio
+Time of generation: 09-jun-2025 8:25:39
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="27,728,108,767" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj64'); setObjMenu('occ_obj64')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa8054e0-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa8054e0-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear programa de estudio
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="4307,738,4352,777" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj65'); setObjMenu('occ_obj65')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf226-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf226-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 2
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="4075,738,4129,777" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj66'); setObjMenu('occ_obj66')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf224-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf224-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 1
+Time of generation: 06-jun-2025 8:08:53
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="74,138,125,161" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj67'); setObjMenu('occ_obj67')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf222-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf222-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Puesto
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="4127,440,4149,479" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj68'); setObjMenu('occ_obj68')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf220-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf220-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap100">
+	<area shape="rect" coords="1229,959,1354,1037" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d9-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d9-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informes
+finales
+entregables
+publicados
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1822,1262,1947,1340" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d6-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d6-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: informes
+parciales
+publicados
+Time of generation: 09-jun-2025 16:22:55
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1550,1183,1590,1223" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d91fba0-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d91fba0-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O exclusivo
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1617,1253,1740,1330" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bf-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bf-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+comentarios 
+y avances
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1038,1037,1161,1114" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bc-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bc-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+informe
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1410,1164,1535,1242" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b9-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b9-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información
+analizada
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1248,1165,1371,1242" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b5-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b5-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Consolidar
+información
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1038,1164,1163,1242" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b3-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b3-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="827,1165,950,1242" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b0-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b0-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Levantar 
+información 
+(Fuentes institución)
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="722,1000,845,1073" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="5050,723,5090,763" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a8-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a8-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:11:17
+Last change: 09-jun-2025 16:11:25
+"/>
+<area shape="rect" coords="5146,978,5271,1056" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a6-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a6-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe final 
+evaluación  del
+plan de estudio
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="5146,861,5271,939" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a4-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a4-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe integrado
+prospección 
+educacional
+entregado
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="5146,704,5271,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a1-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a1-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicación en 
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:04:50
+Last change: 09-jun-2025 16:04:50
+"/>
+<area shape="rect" coords="4828,705,4951,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929e-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929e-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+informe
+final
+Time of generation: 09-jun-2025 16:03:11
+Last change: 10-jul-2025 12:47:47
+"/>
+<area shape="rect" coords="4617,705,4740,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929b-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929b-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicar
+avances
+parciales en
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4169,723,4209,763" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539296-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539296-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:01:39
+Last change: 09-jun-2025 16:01:45
+"/>
+<area shape="rect" coords="4249,842,4372,919" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539294-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539294-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar 
+avances 
+consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="4421,704,4546,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539291-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539291-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Feedback 
+entregado
+consultoría
+Prospección
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:06:21
+"/>
+<area shape="rect" coords="4249,705,4372,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar control y 
+seguimiento 
+de consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4010,704,4135,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3828,842,3951,919" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8a-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8a-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Gestionar
+contrato
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3738,723,3778,763" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa85-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa85-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:30:49
+Last change: 09-jun-2025 15:30:55
+"/>
+<area shape="rect" coords="3828,705,3951,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa82-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa82-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+inducción
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3484,723,3524,763" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:29:25
+Last change: 09-jun-2025 15:29:32
+"/>
+<area shape="rect" coords="3560,841,3685,919" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7b-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7b-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+informada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3560,704,3685,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa78-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa78-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+adjudicada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3301,705,3424,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa75-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa75-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3129,704,3254,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa72-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa72-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2933,705,3056,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear 
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="2757,704,2882,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6c-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6c-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR ajustado
+entregado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2512,705,2635,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa68-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa68-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Revisar 
+TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="2328,723,2368,763" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa61-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa61-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2149,841,2274,919" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj33'); setObjMenu('occ_obj33')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cc3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cc3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR para 
+evaluar plan 
+de estudio vigente 
+y perfil de 
+egreso generado
+Time of generation: 09-jun-2025 15:20:37
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2054,723,2094,763" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj34'); setObjMenu('occ_obj34')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbe-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbe-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 15:18:31
+Last change: 09-jun-2025 15:18:37
+"/>
+<area shape="rect" coords="2149,704,2274,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj35'); setObjMenu('occ_obj35')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbc-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbc-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR prospección 
+educacional 
+generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2149,567,2274,645" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj36'); setObjMenu('occ_obj36')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cba-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cba-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR de 
+prospección
+ laboral generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1880,705,2003,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj37'); setObjMenu('occ_obj37')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb7-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb7-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Estudiar
+pertinencia TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1819,879,1859,919" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj38'); setObjMenu('occ_obj38')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:15:12
+Last change: 09-jun-2025 15:15:18
+"/>
+<area shape="rect" coords="1880,979,2003,1056" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj39'); setObjMenu('occ_obj39')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Construir FODA
+planes vigentes
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1660,861,1785,939" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj40'); setObjMenu('occ_obj40')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cae-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cae-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1459,861,1582,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj41'); setObjMenu('occ_obj41')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cab-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cab-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Ajustar plan de
+prospecciones
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1288,861,1413,939" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj42'); setObjMenu('occ_obj42')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca8-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca8-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información 
+referencial 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1090,861,1213,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj43'); setObjMenu('occ_obj43')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca5-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca5-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar
+información 
+referencial 
+para estudio
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="916,861,1041,939" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj44'); setObjMenu('occ_obj44')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Kickoff
+presentado
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="722,861,845,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj45'); setObjMenu('occ_obj45')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659c-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659c-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar Kickoff
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="353,861,476,938" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj46'); setObjMenu('occ_obj46')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659a-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659a-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Hacer plan 
+prospección 
+diseño 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="939,432,1056,505" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj47'); setObjMenu('occ_obj47')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546592-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546592-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="1143,433,1266,505" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj48'); setObjMenu('occ_obj48')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546590-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546590-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+diagnóstico y 
+propuesta 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="722,710,845,782" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj49'); setObjMenu('occ_obj49')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+acciones de 
+aprendizaje
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="722,237,845,309" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj50'); setObjMenu('occ_obj50')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="722,527,845,599" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj51'); setObjMenu('occ_obj51')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a328-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a328-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+plan de estudio
+vigente
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="605,360,643,398" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj52'); setObjMenu('occ_obj52')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a324-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a324-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:02:30
+Last change: 09-jun-2025 15:02:39
+"/>
+<area shape="rect" coords="722,435,845,507" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj53'); setObjMenu('occ_obj53')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a322-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a322-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+prospección
+educacional
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="722,340,845,412" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj54'); setObjMenu('occ_obj54')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31f-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31f-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+prospección 
+laboral
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="353,343,476,415" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj55'); setObjMenu('occ_obj55')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="399,81,499,153" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj56'); setObjMenu('occ_obj56')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a316-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a316-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Quality gate
+Time of generation: 09-jun-2025 14:13:58
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="353,214,568,287" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj57'); setObjMenu('occ_obj57')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a312-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a312-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Desarrollar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="459,1821,582,1898" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj58'); setObjMenu('occ_obj58')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30d-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30d-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="301,1742,424,1819" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj59'); setObjMenu('occ_obj59')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30b-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30b-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+actualización
+instruccional
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="301,1625,424,1702" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj60'); setObjMenu('occ_obj60')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a309-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a309-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar
+curriculo
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="37,1625,160,1702" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj61'); setObjMenu('occ_obj61')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a307-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a307-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear perfil de egreso
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="669,1468,938,1545" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj62'); setObjMenu('occ_obj62')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a303-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a303-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Cerrar programa de estudio
+Description/Definition: Término de un Programa por pérdida de pertinencia de acuerdo a la evaluación de la VRA
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="301,1468,570,1545" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj63'); setObjMenu('occ_obj63')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a301-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a301-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar programa de estudio
+Time of generation: 09-jun-2025 8:25:39
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="37,1468,198,1545" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj64'); setObjMenu('occ_obj64')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa8054e0-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa8054e0-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear programa de estudio
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="8776,1488,8866,1565" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj65'); setObjMenu('occ_obj65')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf226-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf226-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 2
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="8302,1488,8410,1565" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj66'); setObjMenu('occ_obj66')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf224-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf224-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 1
+Time of generation: 06-jun-2025 8:08:53
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="133,264,234,310" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj67'); setObjMenu('occ_obj67')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf222-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf222-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Puesto
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="8408,881,8453,958" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj68'); setObjMenu('occ_obj68')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf220-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf220-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap125">
+	<area shape="rect" coords="1538,1199,1694,1296" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d9-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d9-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informes
+finales
+entregables
+publicados
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="2282,1580,2438,1677" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d9270d6-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d9270d6-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: informes
+parciales
+publicados
+Time of generation: 09-jun-2025 16:22:55
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1941,1480,1991,1530" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5d91fba0-456f-11f0-24ea-5cb47e4f1a87', 'general')"href="o5d91fba0-456f-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O exclusivo
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="2025,1568,2179,1664" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bf-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bf-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+comentarios 
+y avances
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1298,1298,1452,1394" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392bc-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392bc-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+informe
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1766,1457,1922,1554" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b9-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b9-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información
+analizada
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1562,1457,1716,1553" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b5-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b5-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Consolidar
+información
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1299,1457,1455,1554" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b3-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b3-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="1034,1457,1188,1553" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392b0-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392b0-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Levantar 
+información 
+(Fuentes institución)
+Time of generation: 09-jun-2025 16:28:46
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="901,1251,1055,1342" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="6334,902,6384,952" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a8-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a8-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:11:17
+Last change: 09-jun-2025 16:11:25
+"/>
+<area shape="rect" coords="6454,1223,6610,1320" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a6-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a6-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe final 
+evaluación  del
+plan de estudio
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="6454,1076,6610,1173" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a4-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a4-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Informe integrado
+prospección 
+educacional
+entregado
+Time of generation: 09-jun-2025 16:12:41
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="6454,879,6610,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa85392a1-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa85392a1-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicación en 
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:04:50
+Last change: 09-jun-2025 16:04:50
+"/>
+<area shape="rect" coords="6055,880,6209,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929e-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929e-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+informe
+final
+Time of generation: 09-jun-2025 16:03:11
+Last change: 10-jul-2025 12:47:47
+"/>
+<area shape="rect" coords="5791,880,5945,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa853929b-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa853929b-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Publicar
+avances
+parciales en
+plataforma
+colaborativa
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="5228,902,5278,952" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539296-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539296-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 16:01:39
+Last change: 09-jun-2025 16:01:45
+"/>
+<area shape="rect" coords="5328,1052,5482,1148" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539294-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539294-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar 
+avances 
+consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="5545,879,5701,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa8539291-4568-11f0-24ea-5cb47e4f1a87', 'general')"href="oa8539291-4568-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Feedback 
+entregado
+consultoría
+Prospección
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:06:21
+"/>
+<area shape="rect" coords="5328,880,5482,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar control y 
+seguimiento 
+de consultoría
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="5028,879,5184,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4800,1052,4954,1148" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa8a-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa8a-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Gestionar
+contrato
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4687,902,4737,952" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa85-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa85-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:30:49
+Last change: 09-jun-2025 15:30:55
+"/>
+<area shape="rect" coords="4800,880,4954,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa82-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa82-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+inducción
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4368,902,4418,952" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7d-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7d-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:29:25
+Last change: 09-jun-2025 15:29:32
+"/>
+<area shape="rect" coords="4463,1051,4619,1148" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa7b-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa7b-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+informada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4463,879,4619,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa78-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa78-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta
+adjudicada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="4139,880,4293,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa75-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa75-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3922,879,4078,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa72-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa72-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Propuesta 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3677,880,3831,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6f-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6f-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear 
+propuesta
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="3455,879,3611,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa6c-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa6c-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR ajustado
+entregado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="3148,880,3302,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa68-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa68-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Revisar 
+TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="2917,902,2967,952" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obb96fa61-4566-11f0-24ea-5cb47e4f1a87', 'general')"href="obb96fa61-4566-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2693,1051,2849,1148" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj33'); setObjMenu('occ_obj33')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cc3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cc3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR para 
+evaluar plan 
+de estudio vigente 
+y perfil de 
+egreso generado
+Time of generation: 09-jun-2025 15:20:37
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2573,902,2623,952" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj34'); setObjMenu('occ_obj34')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbe-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbe-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla O
+Time of generation: 09-jun-2025 15:18:31
+Last change: 09-jun-2025 15:18:37
+"/>
+<area shape="rect" coords="2693,879,2849,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj35'); setObjMenu('occ_obj35')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cbc-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cbc-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR prospección 
+educacional 
+generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2693,707,2849,804" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj36'); setObjMenu('occ_obj36')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cba-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cba-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: TDR de 
+prospección
+ laboral generado
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2355,880,2509,976" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj37'); setObjMenu('occ_obj37')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb7-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb7-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Estudiar
+pertinencia TDR
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2278,1099,2328,1149" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj38'); setObjMenu('occ_obj38')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb3-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb3-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:15:12
+Last change: 09-jun-2025 15:15:18
+"/>
+<area shape="rect" coords="2355,1224,2509,1320" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj39'); setObjMenu('occ_obj39')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cb1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cb1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Construir FODA
+planes vigentes
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="2079,1076,2235,1173" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj40'); setObjMenu('occ_obj40')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cae-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cae-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1827,1076,1981,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj41'); setObjMenu('occ_obj41')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548cab-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548cab-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Ajustar plan de
+prospecciones
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1612,1076,1768,1173" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj42'); setObjMenu('occ_obj42')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca8-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca8-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: información 
+referencial 
+entregada
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:03:11
+"/>
+<area shape="rect" coords="1364,1076,1518,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj43'); setObjMenu('occ_obj43')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca5-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca5-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar
+información 
+referencial 
+para estudio
+Time of generation: 09-jun-2025 16:03:11
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="1145,1076,1301,1173" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj44'); setObjMenu('occ_obj44')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d548ca1-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d548ca1-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Kickoff
+presentado
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="901,1076,1055,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj45'); setObjMenu('occ_obj45')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659c-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659c-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Preparar Kickoff
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="439,1076,593,1172" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj46'); setObjMenu('occ_obj46')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d54659a-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d54659a-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Hacer plan 
+prospección 
+diseño 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="1174,538,1320,629" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj47'); setObjMenu('occ_obj47')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546592-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546592-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evento
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="1430,539,1584,629" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj48'); setObjMenu('occ_obj48')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8d546590-4564-11f0-24ea-5cb47e4f1a87', 'general')"href="o8d546590-4564-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+diagnóstico y 
+propuesta 
+curricular
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="901,887,1055,977" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj49'); setObjMenu('occ_obj49')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+acciones de 
+aprendizaje
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:12:41
+"/>
+<area shape="rect" coords="901,293,1055,383" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj50'); setObjMenu('occ_obj50')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a32a-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a32a-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Caracterizar
+estudiante
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:28:46
+"/>
+<area shape="rect" coords="901,657,1055,747" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj51'); setObjMenu('occ_obj51')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a328-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a328-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Evaluar
+plan de estudio
+vigente
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="754,447,801,494" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj52'); setObjMenu('occ_obj52')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a324-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a324-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Regla Y
+Time of generation: 09-jun-2025 15:02:30
+Last change: 09-jun-2025 15:02:39
+"/>
+<area shape="rect" coords="901,542,1055,632" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj53'); setObjMenu('occ_obj53')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a322-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a322-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar 
+prospección
+educacional
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 16:14:29
+"/>
+<area shape="rect" coords="901,422,1055,512" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj54'); setObjMenu('occ_obj54')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31f-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31f-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+prospección 
+laboral
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="439,426,593,516" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj55'); setObjMenu('occ_obj55')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a31c-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a31c-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: preparar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="496,97,621,186" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj56'); setObjMenu('occ_obj56')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a316-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a316-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Quality gate
+Time of generation: 09-jun-2025 14:13:58
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="439,264,708,355" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj57'); setObjMenu('occ_obj57')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a312-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a312-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Desarrollar
+prospección
+Time of generation: 09-jun-2025 15:10:24
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="571,2281,725,2377" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj58'); setObjMenu('occ_obj58')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30d-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30d-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 15:10:24
+"/>
+<area shape="rect" coords="373,2183,527,2279" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj59'); setObjMenu('occ_obj59')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a30b-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a30b-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Realizar
+actualización
+instruccional
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="373,2035,527,2131" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj60'); setObjMenu('occ_obj60')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a309-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a309-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar
+curriculo
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="43,2035,197,2131" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj61'); setObjMenu('occ_obj61')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a307-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a307-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear perfil de egreso
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="836,1838,1172,1934" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj62'); setObjMenu('occ_obj62')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a303-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a303-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Cerrar programa de estudio
+Description/Definition: Término de un Programa por pérdida de pertinencia de acuerdo a la evaluación de la VRA
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="373,1838,709,1934" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj63'); setObjMenu('occ_obj63')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa80a301-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa80a301-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Actualizar programa de estudio
+Time of generation: 09-jun-2025 8:25:39
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="43,1838,244,1934" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj64'); setObjMenu('occ_obj64')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oaa8054e0-452c-11f0-24ea-5cb47e4f1a87', 'general')"href="oaa8054e0-452c-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Crear programa de estudio
+Time of generation: 09-jun-2025 8:34:26
+Last change: 09-jun-2025 8:34:26
+"/>
+<area shape="rect" coords="11010,1863,11122,1959" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj65'); setObjMenu('occ_obj65')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf226-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf226-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 2
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="10416,1863,10550,1959" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj66'); setObjMenu('occ_obj66')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf224-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf224-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: 1
+Time of generation: 06-jun-2025 8:08:53
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="162,327,288,384" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj67'); setObjMenu('occ_obj67')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf222-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf222-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Puesto
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+<area shape="rect" coords="10548,1101,10604,1197" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj68'); setObjMenu('occ_obj68')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o61ecf220-42ce-11f0-24ea-5cb47e4f1a87', 'general')"href="o61ecf220-42ce-11f0-24ea-5cb47e4f1a87_inf.htm" alt="Name: Función
+Time of generation: 06-jun-2025 8:27:00
+Last change: 06-jun-2025 8:27:00
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+
+
+
+
+
+</div>
+
+<div id="printFunctions" class="menu" style="visibility:hidden; left:-1000; top: -1000"> 
+	<table width="120%">
+    	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showPrintFunctions()" onclick="Print(false, 'printFunctions')"><script>document.write(properties[selectedLangTag]['wp_standard_print']);</script></td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showPrintFunctions()"" onclick="Print(true, 'printFunctions')"><script>document.write(properties[selectedLangTag]['wp_page_print']);</script> </td>
+    	</tr>
+        </table>
+</div>
+
+<div id="zoomFunctions" class="menu" style="visibility:hidden; left:-1000; top: -1000"> 
+	<table width="120%">
+    	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(0, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomin']);</script></td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(1, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomout']);</script> </td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(2, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomhund']);</script> </td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(3, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomopt']);</script> </td>
+    	</tr>
+        </table>
+</div>
+
+
+
+
+<div class="doc" id="imageDiv" > 
+<img id="m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87" src="m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87_100.png" onclick="loadModelPage('m46fd31a0-42ce-11f0-24ea-5cb47e4f1a87', 'general')" usemap="#ObjectMap100"></img>
+
+</div>
+
+</div>
+
+<div id="modLinks" class="doc"> 
+<MODEL LINKS>
+</div>
+
+<div id="print" >
+</div>
+
+</body>
+</html>
