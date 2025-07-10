@@ -1,0 +1,642 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Business Publisher</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<script src="properties.js"></script>
+	<script src="exportedObjects.js"></script>
+	<script src="exportedModels.js"></script>
+<script>
+var selectedLangTag = "es";
+
+function JS_List_Jump(){
+	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
+}
+
+function loadObjectPages(url, target) {
+	if (searchObject(url) == false) {
+		alert(properties[selectedLangTag]['wp_objectNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+function loadModelPages(url, target) {
+	if (searchModel(url) == false) {
+		alert(properties[selectedLangTag]['wp_modelNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+</script>
+
+</head>
+<body  bgcolor='#FFFFFF'>
+
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_model']);</script></p>
+
+<div id="auswahl"><font face="Arial">
+	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
+	<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+	<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+        <option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+	<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+	<option value="#Objects"><script>document.write(properties[selectedLangTag]['wp_objects']);</script></option>
+	<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+        <option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+        </td></tr></table></form></font>
+</div>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Attributes"></a>&nbsp;<b><script>document.write(properties['es']['wp_attributes']);</script></b></th>
+</tr>
+<tr>
+	<td>Creator</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Last change</td>
+	<td>05-oct-2009 3:38:48</td>
+</tr>
+<tr>
+	<td>Last user</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>ITIL Rollen</td>
+</tr>
+<tr>
+	<td>Time of generation</td>
+	<td>09-oct-2007 2:34:48</td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_FEEDBACK>
+<ARIS OBJ_INF_HIERARCHY>
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Objects"></a>&nbsp;<b><script>document.write(properties['es']['wp_objects']);</script></b></th>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="o893e1cc6-8e96-11dc-5e39-000ae4141842_inf.htm" target="info">Access Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o5d450a62-8c6a-11dc-5e39-000ae4141842_inf.htm" target="info">Anwender</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o856677d6-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Application Analyst/Architekt</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o856677d6-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Application Analyst/Architekt</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o856677d6-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Application Analyst/Architekt</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="o856677d2-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Application Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o856677d1-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Application Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb044-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Availability Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa57d0356-7635-11dc-5e39-000ae4141842_inf.htm" target="info">Availability Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccca-91df-11dc-5e39-000ae4141842_inf.htm" target="info">Build and Test Environment Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o15a7aa4d-ad54-11dc-5e39-000ae4141842_inf.htm" target="info">Business Relationship Mngr</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54ea-7649-11dc-5e39-000ae4141842_inf.htm" target="info">CAB Mitglied</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb043-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Capacity Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa57d0354-7635-11dc-5e39-000ae4141842_inf.htm" target="info">Capacity Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="obfde1fe0-91d1-11dc-5e39-000ae4141842_inf.htm" target="info">Change-Genehmigungskompetenz</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb050-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Change Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54e8-7649-11dc-5e39-000ae4141842_inf.htm" target="info">Change Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o2aee5860-ec59-11dc-5e39-000ae4141842_inf.htm" target="info">Chief Sourcing Officer</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54ec-7649-11dc-5e39-000ae4141842_inf.htm" target="info">CMS/Tools Administrator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccc1-91df-11dc-5e39-000ae4141842_inf.htm" target="info">Conf. Control Board Mitglied</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54e6-7649-11dc-5e39-000ae4141842_inf.htm" target="info">Configuration Administrator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54e4-7649-11dc-5e39-000ae4141842_inf.htm" target="info">Configuration Analyst</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54e2-7649-11dc-5e39-000ae4141842_inf.htm" target="info">Configuration Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="odf148a79-9359-11dc-5e39-000ae4141842_inf.htm" target="info">Continual Service Improvement</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o87447070-ac9b-11dc-5e39-000ae4141842_inf.htm" target="info">CSI Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccc6-91df-11dc-5e39-000ae4141842_inf.htm" target="info">Deployment Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccc8-91df-11dc-5e39-000ae4141842_inf.htm" target="info">Early Life Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="obfde1fde-91d1-11dc-5e39-000ae4141842_inf.htm" target="info">ECAB Mitglied</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb054-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Evaluation</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oa25729be-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Event Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o9de45bee-8c3b-11dc-5e39-000ae4141842_inf.htm" target="info">First-Level Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o9de45bee-8c3b-11dc-5e39-000ae4141842_inf.htm" target="info">First-Level Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o9de45bee-8c3b-11dc-5e39-000ae4141842_inf.htm" target="info">First-Level Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o9de45bee-8c3b-11dc-5e39-000ae4141842_inf.htm" target="info">First-Level Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o5d450a8f-8c6a-11dc-5e39-000ae4141842_inf.htm" target="info">Fulfilment Group Mitglied</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="o856677d9-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Incident Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="od6780b63-70e7-11dc-5e39-000ae4141842_inf.htm" target="info">Incident Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb046-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Information Security Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccd7-91df-11dc-5e39-000ae4141842_inf.htm" target="info">IT-Designer/Architekt</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729a6-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">IT Operations Analyst</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oa25729a0-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">IT Operations Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729a2-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">IT Operations Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729a8-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">IT Operator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729a8-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">IT Operator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729a8-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">IT Operator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccd5-91df-11dc-5e39-000ae4141842_inf.htm" target="info">IT-Planer</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb045-7631-11dc-5e39-000ae4141842_inf.htm" target="info">IT Service Continuity Managament</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa57d0358-7635-11dc-5e39-000ae4141842_inf.htm" target="info">IT Service Continuity Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb030-7631-11dc-5e39-000ae4141842_inf.htm" target="info">IT Service Provider</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="odf148a71-9359-11dc-5e39-000ae4141842_inf.htm" target="info">IT Service Supplier</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb05b-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Knowledge Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of4fd168b-8923-11dc-5e39-000ae4141842_inf.htm" target="info">Knowledge Mgmt. Process Owner</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="o27b37227-76fc-11dc-5e39-000ae4141842_inf.htm" target="info">Kunde</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o27b3722a-76fc-11dc-5e39-000ae4141842_inf.htm" target="info">Mitarbeiter des Kundenunternehmens</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ofcfe7f1e-9d94-11dc-5e39-000ae4141842_inf.htm" target="info">Mitarbeiter des Supplier-Unternehmens</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oa25729ba-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Problem Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o7dfc29bc-7d47-11dc-5e39-000ae4141842_inf.htm" target="info">Problem Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729c7-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Problem Solving Group Mitglied</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa9142002-8d2f-11dc-5e39-000ae4141842_inf.htm" target="info">Problem Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o15a7aa54-ad54-11dc-5e39-000ae4141842_inf.htm" target="info">Process Owner</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o15a7aa4e-ad54-11dc-5e39-000ae4141842_inf.htm" target="info">Product Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o15a7aa55-ad54-11dc-5e39-000ae4141842_inf.htm" target="info">Prozessmanager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb052-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Release and Deployment Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o9c0fb7c1-8600-11dc-5e39-000ae4141842_inf.htm" target="info">Release and Deployment Mgr.</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06eccc4-91df-11dc-5e39-000ae4141842_inf.htm" target="info">Release Packaging and Build Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o87447072-ac9b-11dc-5e39-000ae4141842_inf.htm" target="info">Reporting Analyst</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oa25729c0-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Request Fulfilment</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="obea9bdee-879e-11dc-5e39-000ae4141842_inf.htm" target="info">Risk Evaluation Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729a4-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Schichtleiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o9de45bef-8c3b-11dc-5e39-000ae4141842_inf.htm" target="info">Second-Level Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa57d035a-7635-11dc-5e39-000ae4141842_inf.htm" target="info">Security Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa57d035a-7635-11dc-5e39-000ae4141842_inf.htm" target="info">Security Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb051-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Asset and Configuration Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocecc54e0-7649-11dc-5e39-000ae4141842_inf.htm" target="info">Service Asset Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb040-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Catalogue Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o619e4692-756d-11dc-5e39-000ae4141842_inf.htm" target="info">Service Catalogue Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb038-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Design</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oc6afb060-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Design Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oa25729aa-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Service Desk</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o7a475340-82d2-11dc-5e39-000ae4141842_inf.htm" target="info">Service Desk Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o7a475340-82d2-11dc-5e39-000ae4141842_inf.htm" target="info">Service Desk Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729ae-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Service Desk Supervisor</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb042-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Level Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa57d0352-7635-11dc-5e39-000ae4141842_inf.htm" target="info">Service Level Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o87447073-ac9b-11dc-5e39-000ae4141842_inf.htm" target="info">Service Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="o856677d0-90f3-11dc-5e39-000ae4141842_inf.htm" target="info">Service Operation</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o15a7aa56-ad54-11dc-5e39-000ae4141842_inf.htm" target="info">Service Owner</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="odf148a72-9359-11dc-5e39-000ae4141842_inf.htm" target="info">Service Strategy</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ob467ec5d-86e3-11dc-5e39-000ae4141842_inf.htm" target="info">Service Test Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb03a-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Transition</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o93a97bc5-815a-11dc-5e39-000ae4141842_inf.htm" target="info">Service Transition Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o93a97bc5-815a-11dc-5e39-000ae4141842_inf.htm" target="info">Service Transition Manager</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb053-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Service Validation and Testing</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb047-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Supplier Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="ocda790c5-7595-11dc-5e39-000ae4141842_inf.htm" target="info">Supplier Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729b6-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Technical Analyst</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oa25729b2-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Technical Management</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729b4-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Technical Manager</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729b8-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Technical Operator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729b8-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Technical Operator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="oa25729b8-91bd-11dc-5e39-000ae4141842_inf.htm" target="info">Technical Operator</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of06ecccd-91df-11dc-5e39-000ae4141842_inf.htm" target="info">Test Support Team Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="of5a2bc67-8c44-11dc-5e39-000ae4141842_inf.htm" target="info">Third-Level Support Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>Organizational unit type</td>
+	<td><a href="oc6afb04e-7631-11dc-5e39-000ae4141842_inf.htm" target="info">Transition Planning and Support</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o34c1b25b-8148-11dc-5e39-000ae4141842_inf.htm" target="info">Vertragsmanager</a></td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_MASTER>
+<ARIS MOD_INF_VARIANTS>
+
+</body>
+</html>
+

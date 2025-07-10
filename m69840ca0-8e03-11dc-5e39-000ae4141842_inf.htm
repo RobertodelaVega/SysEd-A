@@ -1,0 +1,344 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Business Publisher</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<script src="properties.js"></script>
+	<script src="exportedObjects.js"></script>
+	<script src="exportedModels.js"></script>
+<script>
+var selectedLangTag = "es";
+
+function JS_List_Jump(){
+	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
+}
+
+function loadObjectPages(url, target) {
+	if (searchObject(url) == false) {
+		alert(properties[selectedLangTag]['wp_objectNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+function loadModelPages(url, target) {
+	if (searchModel(url) == false) {
+		alert(properties[selectedLangTag]['wp_modelNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+</script>
+
+</head>
+<body  bgcolor='#FFFFFF'>
+
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_model']);</script></p>
+
+<div id="auswahl"><font face="Arial">
+	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
+	<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+	<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+        <option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+	<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+	<option value="#Objects"><script>document.write(properties[selectedLangTag]['wp_objects']);</script></option>
+	<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+        <option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+        </td></tr></table></form></font>
+</div>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Attributes"></a>&nbsp;<b><script>document.write(properties['es']['wp_attributes']);</script></b></th>
+</tr>
+<tr>
+	<td>Creator</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Last change</td>
+	<td>05-oct-2009 3:36:01</td>
+</tr>
+<tr>
+	<td>Last user</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>Problem
+Management (Abhängigkeit und Controlling)</td>
+</tr>
+<tr>
+	<td>Time of generation</td>
+	<td>08-nov-2007 11:03:42</td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_FEEDBACK>
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Assignments"></a>&nbsp;<b><script>document.write(properties['es']['wp_assignments']);</script></b></th>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="javascript:loadObjectPages('o5b483137-d444-11d5-82c2-0004751947b0', 'info')">Problem  Management</a></td>
+</tr>
+<ARIS LIST>
+
+</table>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Objects"></a>&nbsp;<b><script>document.write(properties['es']['wp_objects']);</script></b></th>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o91604859-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">% der erfolgreichen Reviews von Major Problems</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o91604851-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">% der innerhalb der SLA-Ziele gelösten Probleme</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o9160485d-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">% der rechtzeitig durchgeführten Major Problem Reviews</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o9160485f-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">% Exaktheit der  Known Error Database</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o9160485b-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Anzahl der der KEDB hinzugefügten Known Errors</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o9160484f-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Anzahl der Lösungszielzeiten überschreitenden Probleme</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o91604857-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Anzahl der schwerwiegenden Probleme</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o91604853-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Ausmaß der derzeitig rückständigen Probleme</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="o8c0d9292-cead-4841-bdc3-5dbe45021fd4_inf.htm" target="info">Beschreibung der permanenten Lösung</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o5b483138-d444-11d5-82c2-0004751947b0_inf.htm" target="info">Change  Management</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o5b483138-d444-11d5-82c2-0004751947b0_inf.htm" target="info">Change  Management</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="od343e39c-3f08-11d6-834c-0004751947b0_inf.htm" target="info">CMDB</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="o75f7fcc2-d61d-4933-bdbb-711c6eafb267_inf.htm" target="info">Configuration Item  Record</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o91604855-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Durchschnittliche Kosten für eine Problemabwicklung</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o4b77943d-70bd-11dc-5e39-000ae4141842_inf.htm" target="info">Event Management</a></td>
+</tr>
+<tr>
+	<td>KPI instance</td>
+	<td><a href="o9160484d-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Gesamtanzahl der gemeldeten Incidents</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oc03edc25-fa5e-43b9-b9b1-0ee50f3b687b_inf.htm" target="info">Incident Management</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oc03edc25-fa5e-43b9-b9b1-0ee50f3b687b_inf.htm" target="info">Incident Management</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="odd966688-bc25-4c83-8bb8-ecea2b5946c4_inf.htm" target="info">Incident Record</a></td>
+</tr>
+<tr>
+	<td>Application system type</td>
+	<td><a href="o91604847-8e01-11dc-5e39-000ae4141842_inf.htm" target="info">Known Error Datenbank</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="oc868a316-55d3-11d6-836e-0004751947b0_inf.htm" target="info">Kundenprozesse</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o5b483137-d444-11d5-82c2-0004751947b0_inf.htm" target="info">Problem  Management</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9_inf.htm" target="info">Problem-Statusnachricht</a></td>
+</tr>
+<tr>
+	<td>Person type</td>
+	<td><a href="o7dfc29bc-7d47-11dc-5e39-000ae4141842_inf.htm" target="info">Problem Manager</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" target="info">Problem Record</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" target="info">Problem Record</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" target="info">Problem Record</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" target="info">Problem Record</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" target="info">Problem Record</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" target="info">Problem Record</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="oc1e2ff84-b7ac-444a-8b89-2f263ad918c0_inf.htm" target="info">Problem-Symptombeschreibung</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="obff4bb91-c39b-4fd9-8149-3b1b5a9537c3_inf.htm" target="info">RfC</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="ofdc586dd-f2f7-4e45-ae40-ba786dcaad60_inf.htm" target="info">RfC-Statusnachricht</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o571dc348-91f0-439a-9b1a-6b60ffbb3cb8_inf.htm" target="info">Service Desk</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o571dc348-91f0-439a-9b1a-6b60ffbb3cb8_inf.htm" target="info">Service Desk</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o5b48313f-d444-11d5-82c2-0004751947b0_inf.htm" target="info">Service Level Management</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o4b779427-70bd-11dc-5e39-000ae4141842_inf.htm" target="info">Service Asset and Configuration Management</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o4b779427-70bd-11dc-5e39-000ae4141842_inf.htm" target="info">Service Asset and Configuration Management</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o4b779416-70bd-11dc-5e39-000ae4141842_inf.htm" target="info">Service Design</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="o4b77942d-70bd-11dc-5e39-000ae4141842_inf.htm" target="info">Service Validation and Testing</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="of5442572-40d4-11d6-8351-0004751947b0_inf.htm" target="info">SLA</a></td>
+</tr>
+<tr>
+	<td>Function</td>
+	<td><a href="ocb43f134-7d52-11dc-5e39-000ae4141842_inf.htm" target="info">Supplier-Prozesse</a></td>
+</tr>
+<tr>
+	<td>Technical term</td>
+	<td><a href="o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed_inf.htm" target="info">Workaround-Beschreibung</a></td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+
+<ARIS MOD_INF_MASTER>
+<ARIS MOD_INF_VARIANTS>
+
+</body>
+</html>
+

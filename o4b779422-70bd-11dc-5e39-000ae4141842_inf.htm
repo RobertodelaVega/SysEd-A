@@ -1,0 +1,177 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Business Publisher</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<script src="properties.js"></script>
+	<script src="exportedObjects.js"></script>
+	<script src="exportedModels.js"></script>
+<script>
+var selectedLangTag = "es";
+
+function JS_List_Jump(){
+	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
+}
+
+
+
+function loadObjectPages(url, target) {
+	if (searchObject(url) == false) {
+		alert(properties[selectedLangTag]['wp_objectNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+
+function loadModelPages(url, target) {
+	if (searchModel(url) == false) {
+		alert(properties[selectedLangTag]['wp_modelNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+
+</script>
+</head>
+<body  bgcolor='#FFFFFF'>
+
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_object']);</script></p>
+
+<div id="auswahl"><font face="Arial">
+	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
+		<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+		<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+		<option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+		<option value="#Occurrences"><script>document.write(properties[selectedLangTag]['wp_occurrences']);</script></option>
+		<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+		<option value="#Relationships"><script>document.write(properties[selectedLangTag]['wp_relationships']);</script></option>
+		<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+		<option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+        </td></tr></table></form></font>
+</div>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Attributes"></a>&nbsp;<b><script>document.write(properties['es']['wp_attributes']);</script></b></th>
+</tr>
+<tr>
+	<td>Creator</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Description/Definition</td>
+	<td>Eine Phase im Lebenszyklus eines IT Service. Service Transition umfasst eine Reihe von Prozessen und Funktionen. Gleichzeitig ist es der Titel einer der ITIL Kernpublikationen.</td>
+</tr>
+<tr>
+	<td>Last change</td>
+	<td>10-ene-2008 13:50:40</td>
+</tr>
+<tr>
+	<td>Last user</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>Service Transition</td>
+</tr>
+<tr>
+	<td>Time of generation</td>
+	<td>02-oct-2007 4:16:06</td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+</table>
+
+<ARIS OBJ_INF_FEEDBACK>
+<ARIS OBJ_INF_HIERARCHY>
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Occurrences"></a>&nbsp;<b><script>document.write(properties['es']['wp_occurrences']);</script></b></th>
+</tr>
+<tr>
+	<td>Value-added chain diagram</td>
+	<td><a href="m48b58de0-70bd-11dc-5e39-000ae4141842_nav.htm" target="model">ITIL Prozesslandkarte</a></td>
+</tr>
+<ARIS LIST>
+
+</table>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Relationships"></a>&nbsp;<b><script>document.write(properties['es']['wp_relationships']);</script></b></th>
+</tr>
+<tr>
+	<td>is process-oriented subordinate</td>
+	<td><a href="javascript:loadObjectPages('o4b760d70-70bd-11dc-5e39-000ae4141842', 'info')">ITIL V3 Prozesse</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o4b779429-70bd-11dc-5e39-000ae4141842', 'info')">Transition Planning and Support</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o4b77942d-70bd-11dc-5e39-000ae4141842', 'info')">Service Validation and Testing</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o4b779424-70bd-11dc-5e39-000ae4141842', 'info')">Knowledge Management</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o5b483138-d444-11d5-82c2-0004751947b0', 'info')">Change  Management</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o4b77942e-70bd-11dc-5e39-000ae4141842', 'info')">Evaluation</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o4b77942b-70bd-11dc-5e39-000ae4141842', 'info')">Release and Deployment Management</a></td>
+</tr>
+<tr>
+	<td>is process-oriented superior</td>
+	<td><a href="javascript:loadObjectPages('o4b779427-70bd-11dc-5e39-000ae4141842', 'info')">Service Asset and Configuration Management</a></td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+
+
+</table>
+
+<ARIS OBJ_INF_MASTER>
+<ARIS OBJ_INF_VARIANTS>
+
+</body>
+</html>

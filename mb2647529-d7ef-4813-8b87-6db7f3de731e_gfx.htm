@@ -1,0 +1,1556 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Business Publisher</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<link rel="STYLESHEET"  href="CascadeMenu.css">
+	
+	
+
+
+<style type=text/css>
+
+@media screen{ 
+	
+	#print {
+		display:none;
+		
+	}
+	
+		
+}
+ 
+@media print {
+	
+	#imageDiv {
+		display:none;
+		
+	}
+	#modLinks {
+		display:none;
+	}
+	#screen {
+		display:none;
+	}
+
+	
+}
+
+
+
+
+</style>
+
+<script src="zoom.js"></script>
+<script src='helper.js'></script>
+<script src="properties.js"></script>
+<script src="exportedModels.js"></script>
+
+<script src="tree_logic.js"></script>
+
+
+
+<script>
+
+var selectedLangTag = "es";
+var menu = 'general';
+var objMenu = 'obj';
+var hasToHide = 'true';
+var hasToShowModelInfo = 'true';
+var menuArray = new Array();
+var objMenuArray = new Array();
+var index = 0;
+var modIndex = 0;
+var newPage = true;
+
+function setAssignForMenu(p_menuEntra) {
+	menuArray[index] = p_menuEntra; 
+	index = index + 1;
+}
+
+function setObjForMenu(p_menuEntra) {
+	objMenuArray[modIndex] = p_menuEntra; 
+	modIndex = modIndex + 1;
+}
+
+
+var divMenu = null;
+function showContextMenu(p_objectID){
+
+	if ((parent.info != null) && (parent.info != undefined)) {
+	
+		// bring element visible to ensure its initialized
+		if (document.getElementById) {
+			divMenu = document.getElementById(p_objectID);
+		}
+		else if (document.all) {
+			divMenu = document.all(p_objectID);
+		}
+		else if (document.layers) {
+			divMenu = document.layers(p_objectID);
+		}
+		divMenu.style.left = -1000;
+		divMenu.style.top = -1000;
+		divMenu.style.display = '';
+		divMenu.style.position = 'absolute';
+		var mouse = null;
+		if (isNN) {
+			mouse = getMousePointInWindow(popupEvent);
+		}
+		else {
+			mouse = getMousePointInWindow();
+		}
+				
+		var mx = mouse.getX() - 5;
+    	var my = mouse.getY() - 5;
+
+    	var obj = getObjectBounds(p_objectID);
+    	var wnd = getVisibleRectOfWindow();
+
+    	//correct x:
+    	var scrollWidth = 20; // width of the scrollbar
+    	if((mx + obj.width + scrollWidth)  > wnd.right) {
+        	mx -= (mx + obj.width + scrollWidth) - wnd.right;
+    	}
+
+    	//correct y:
+    	if((my + obj.height + scrollWidth) > wnd.bottom) {
+        	my -= (my + obj.height + scrollWidth) - wnd.bottom;
+    	}
+
+    	// set to final position
+    	divMenu.style.left = mx;
+    	divMenu.style.top = my;
+	}
+	
+}
+
+function closeContextMenu(p_objectID) {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+    	var div = document.getElementById(p_objectID);
+    	if (div != null) {
+    		div.style.display = 'none';
+    	}
+}
+
+function loadPages(url, menuid) {
+	if (url == 'null') {
+		showContextMenu(menuid);
+	}
+	else if (searchModel(url) == false) {
+	}
+        else if (opener != null) {
+		closeContextMenu(menuid);
+		opener.parent.info.location.href=url + "_inf.htm";
+		opener.parent.data.location.href=url + "_gfx.htm";
+		opener.parent.model.location.href=url + "_nav.htm";		
+		opener.focus();				
+	} else {
+		top.info.location.href=url + "_inf.htm";
+		top.data.location.href=url + "_gfx.htm";
+		top.model.location.href=url + "_nav.htm";
+	}
+}
+
+function loadObjectPage(url, menuid) {
+	newPage = false;
+	if (opener != null) {
+		closeContextMenu(menuid);
+		opener.parent.info.location.href=url + "_inf.htm";
+		opener.focus();				
+	} else {	
+		top.info.location.href=url + "_inf.htm";
+	}
+}
+
+function loadModelPage(url, menuid) {
+	if (hasToShowModelInfo == 'true') { 
+		if (opener != null) {
+			opener.parent.info.location.href=url + "_inf.htm";
+			opener.focus();				
+		} else {	
+			top.info.location.href=url + "_inf.htm";
+		}
+	}
+}
+
+
+var zoom = new zoomManager("mb2647529-d7ef-4813-8b87-6db7f3de731e", new Array("25","50","100","125"), "2");
+
+function ZoomOut() {
+	zoom.zoomOut();
+}
+
+function ZoomIn() {
+	zoom.zoomIn();
+}
+
+function ZoomOrig() {
+	zoom.zoomOrig();
+}
+
+function ZoomOptimalSize() {
+	zoom.doOptimalZoom(document.body.clientHeight, document.body.clientWidth, document.getElementById('zoomFunctions'));
+}
+
+function Zoom(code, submenu) {
+	document.getElementById(submenu).style.visibility = "hidden";
+	if (code == 0) {
+		ZoomIn();
+	}
+	else if (code == 1) {
+		ZoomOut();
+	}
+	else if (code == 2) {
+		ZoomOrig();
+	}
+	else if (code == 3) {
+		ZoomOptimalSize();
+	}
+}
+
+
+function Print(singlePage, submenu) {
+
+	document.getElementById(submenu).style.visibility = "hidden";
+
+	var zoomFactor = zoom.getZoomValue();
+
+	var constPageHeight = 842;
+	var constPageWidth = 595;
+	var constDoubleMargin = 136;
+	var constFullPageHeight = constPageHeight + constDoubleMargin;
+	var constFullPageWidth = constPageWidth  + 54;
+	var imageHeight = document.getElementById("mb2647529-d7ef-4813-8b87-6db7f3de731e").offsetHeight;
+	var imageWidth = document.getElementById("mb2647529-d7ef-4813-8b87-6db7f3de731e").offsetWidth;
+	var heightSteps = Math.ceil(imageHeight/constPageHeight);
+	var widthSteps = Math.ceil(imageWidth/constPageWidth);
+	var constFullPageHeightStep = constFullPageHeight * heightSteps;
+	var i = 0;
+	var j = 0;
+	
+	var div = document.getElementById('print');
+
+	removeAllChildren(div);
+
+	var hCorr = constFullPageHeight/imageHeight;
+	var wCorr = constFullPageWidth/imageWidth;
+	
+	if ((imageHeight <= constPageHeight) && (imageWidth <= constPageWidth)) {
+			var p = document.createElement('p');
+			p.innerHTML = '<img id=\"mb2647529-d7ef-4813-8b87-6db7f3de731e\"src=\"mb2647529-d7ef-4813-8b87-6db7f3de731e_'+zoomFactor+'.png\" style=\"width='+imageWidth+'; height='+imageHeight+';\"></img>';		
+			div.appendChild(p);
+		}
+
+	else if (singlePage) {
+			if (hCorr < wCorr) {
+				var p = document.createElement('p');
+				var h = imageHeight * hCorr;
+				var w = imageWidth * hCorr;
+				p.innerHTML = '<img id=\"mb2647529-d7ef-4813-8b87-6db7f3de731e\"src=\"mb2647529-d7ef-4813-8b87-6db7f3de731e_'+zoomFactor+'.png\" style=\"width='+w+'; height='+h+';\"></img>';		
+				div.appendChild(p);
+			}
+			else {
+				var p = document.createElement('p');
+				var h = imageHeight * wCorr;
+				var w = imageWidth * wCorr;
+				p.innerHTML = '<img id=\"mb2647529-d7ef-4813-8b87-6db7f3de731e\"src=\"mb2647529-d7ef-4813-8b87-6db7f3de731e_'+zoomFactor+'.png\" style=\"width='+w+'; height='+h+';\"></img>';		
+				div.appendChild(p);
+			}
+		
+	}
+	else {	
+		while(i < widthSteps) {
+			while(j < heightSteps) {
+				var p = document.createElement('p');
+				if (isIE) {
+					p.style.setAttribute('position', 'static');
+					p.style.setAttribute('page-break-after', '');
+				}
+				else {
+					p.setAttribute('style', 'position:static');
+					p.setAttribute('style', "page-break-after:''");
+				}
+				p.innerHTML = '<img id=\"mb2647529-d7ef-4813-8b87-6db7f3de731e\"src=\"mb2647529-d7ef-4813-8b87-6db7f3de731e_'+zoomFactor+'.png\" style=\"position:absolute; top:'+i*constFullPageHeightStep+' px; left:-'+i*constFullPageWidth+' px; overflow:hidden;clip:rect('+j*constPageHeight+' px,  '+(i+1)*constFullPageWidth +' px,  '+(j+1)*constPageHeight+' px,  '+i*constFullPageWidth+' px )\"></img>';		
+				div.appendChild(p);
+				j=j+1;
+				
+			}
+			j=0;
+			i=i+1;
+		}
+	}
+	
+	top.data.focus();
+	window.print();
+	
+}
+
+function removeAllChildren(targetElement) {
+    if (targetElement && targetElement.childNodes) {
+        for (var rloop = targetElement.childNodes.length -1; rloop >= 0 ; rloop--) {
+            targetElement.removeChild(targetElement.childNodes[rloop]);
+        }
+    }
+}
+
+function showOverviewIfNeeded() {
+	if ((parent.frames["tree"] != "undefined") && (parent.frames["tree"] != null))	{
+		var treeTab = parent.frames["tree"].document.getElementById("treeTab");	
+		if (treeTab.className == "tabinactive") {
+			var overview = parent.frames["tree"].document.getElementById("overviewTab");	
+    			if (overview.style.display == '') {
+				setOverview();
+			}
+		}
+	}
+}
+
+function setOverview() {
+	var id = zoom.getId();
+	var img = parent.data.document.getElementById(id);
+	if (img != null) {
+		parent.frames["tree"].showOverview(false);
+  	}
+	else {
+      		setTimeout("setOverview()", 100);
+	}
+
+}
+
+function keyPressed (e) {
+  	if (!e) {
+    		e = window.event;
+	}
+  	if (e.which) {
+    		kCode = e.which;
+  	} 	
+	else if (e.keyCode) {
+    		kCode = e.keyCode;
+  	}
+	if (kCode == 43) {
+		ZoomIn();
+	}
+	else if (kCode == 45) {
+		ZoomOut();
+	}
+	else if (kCode == 42) {
+		ZoomOrig();
+	}
+  	
+}
+
+document.onkeypress = keyPressed;
+
+isIE=document.all;
+isNN=!document.all&&document.getElementById;
+isN4=document.layers;
+
+
+if (isIE||isNN){
+document.oncontextmenu=showPopup;
+document.onclick=hidePopup;
+}else{
+document.captureEvents(Event.MOUSEDOWN || Event.MOUSEUP);
+document.onmousedown=showPopup;
+document.onclick=hidePopup;
+}
+
+var popupEvent = null;
+
+function showPopup(e) {
+	if (isNN) {
+	
+		popupEvent = e;
+	}
+
+	hidePopup(2);
+	showContextMenu(menu);
+	return false;
+/*
+if (isN4){
+if (e.which==2||e.which==3){
+    hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+}else {
+    hidePopup(2);
+return false;
+}
+}else{
+    //hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+
+}
+*/
+}
+
+function showPopup2(e){
+if (isN4){
+if (e.which==2||e.which==3){
+	hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+}else {
+	hidePopup(2);
+return false;
+}
+}else{
+	hidePopup(2);
+	showContextMenu(menu);
+
+return false;
+
+}
+}
+
+function hidePopup(e) {
+	var ret = false;
+    	if (hasToHide == 'true') {
+		document.getElementById('printFunctions').style.visibility = "hidden";
+		document.getElementById('zoomFunctions').style.visibility = "hidden";
+		if (isN4){
+			if (e.which==1){
+				closeContextMenu(menu);
+    				closeContextMenu(objMenu);
+				for (var i = 0; i < menuArray.length; i++) {
+					closeContextMenu(menuArray[i]);
+				}
+    				for (var i = 0; i < objMenuArray.length; i++) {
+					closeContextMenu(objMenuArray[i]);
+				}
+				ret = newPage;
+				newPage = true;  
+				return ret;
+			}else {
+				closeContextMenu(menu);
+    				closeContextMenu(objMenu);
+				for (var i = 0; i < menuArray.length; i++) {
+					closeContextMenu(menuArray[i]);
+				}
+    				for (var i = 0; i < objMenuArray.length; i++) {
+					closeContextMenu(objMenuArray[i]);
+				}
+				ret = newPage;
+				newPage = true;  
+				return ret;
+			}
+		}
+		else{
+			closeContextMenu(menu);
+    			closeContextMenu(objMenu);
+			for (var i = 0; i < menuArray.length; i++) {
+				closeContextMenu(menuArray[i]);
+			}
+    			for (var i = 0; i < objMenuArray.length; i++) {
+				closeContextMenu(objMenuArray[i]);
+			}
+			ret = newPage;
+			newPage = true;  
+			return ret;
+
+		}
+	}
+	else {
+		setHasToHide('true') ;
+		ret = newPage;
+			newPage = true;  
+			return ret;
+	}
+}
+
+function setMenu(p_menu) {
+	menu = p_menu;
+}
+
+function setObjMenu(p_menu) {
+	objMenu = p_menu;
+}
+
+function setHasToHide(p_hide) {
+	hasToHide = p_hide;
+}
+
+function setModelInfoToShow(p_modInfo) {
+	hasToShowModelInfo = p_modInfo;
+}
+
+function frameScroll() {
+	var wnd = getVisibleRectOfWindow();
+	parent.tree.setRectPositionAfterModelScroll(wnd.x, wnd.y);
+}
+
+function ShowSubMenu(obj, menu) {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+	
+	if (menu == 'zoom') {
+		menu = document.getElementById('zoomFunctions');
+	}
+	else {
+		menu = document.getElementById('printFunctions');
+	}
+	
+	if(menu != null) {
+		if (isIE) {
+			menu.style.visibility = "visible";
+			menu.style.pixelTop = obj.getBoundingClientRect().top + document.body.scrollTop; 
+			menu.style.pixelLeft = divMenu.style.pixelLeft + divMenu.offsetWidth -5;
+			
+			var x = menu.style.pixelLeft + menu.offsetWidth;
+			if(x > document.body.clientWidth + document.body.scrollLeft) {
+				menu.style.pixelLeft = divMenu.style.pixelLeft - menu.offsetWidth+5;
+			}
+		}
+		else {
+			menu.style.visibility = "visible";
+			if (obj.getBoundingClientRect) {
+				menu.style.top = obj.getBoundingClientRect().top + document.body.scrollTop;
+			}
+			else {
+				menu.style.top = document.getBoxObjectFor(obj).y + document.documentElement.scrollTop;
+			}
+			menu.style.left = parseInt(divMenu.style.left) + divMenu.offsetWidth -5;// + document.body.scrollLeft;
+			var x = menu.style.left + menu.offsetWidth;
+			// muss noch korrigiert werden!!!
+			if(x > parseInt(document.body.clientWidth + document.body.scrollLeft)) {
+				menu.style.left = parseInt(divMenu.style.left) - menu.offsetWidth+5;// + document.body.scrollLeft;
+			}
+		}
+    }
+	
+}
+
+function hidePrintFunctions() {
+	document.getElementById('printFunctions').style.visibility = "hidden";
+}
+
+function hideZoomFunctions() {
+	document.getElementById('zoomFunctions').style.visibility = "hidden";
+}
+
+function showPrintFunctions() {
+	document.getElementById('printFunctions').style.visibility = "visible";
+}
+
+function showZoomFunctions() {
+	document.getElementById('zoomFunctions').style.visibility = "visible";
+}
+
+
+function setHighlightForArrow1() {
+	document.getElementById('arrowSign1').style.backgroundColor = "#EFECE6";
+	document.getElementById('zoomMenu').style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForArrow1() {
+	document.getElementById('arrowSign1').style.backgroundColor = "#FFFFFF";
+	document.getElementById('zoomMenu').style.backgroundColor = "#FFFFFF";
+}
+
+function setHighlightForArrow2() {
+	document.getElementById('arrowSign2').style.backgroundColor = "#EFECE6";
+	document.getElementById('printMenu').style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForArrow2() {
+	document.getElementById('arrowSign2').style.backgroundColor = "#FFFFFF";
+	document.getElementById('printMenu').style.backgroundColor = "#FFFFFF";
+}
+
+function setHighlightForLinks(id1, id2) {
+	document.getElementById(id1).style.backgroundColor = "#EFECE6";
+	document.getElementById(id2).style.backgroundColor = "#EFECE6";
+}
+
+function setNoHighlightForLinks(id1, id2) {
+	document.getElementById(id1).style.backgroundColor = "#FFFFFF";
+	document.getElementById(id2).style.backgroundColor = "#FFFFFF";
+}
+
+
+
+</script>		
+</head>
+
+<body onLoad='javascript: showOverviewIfNeeded();' onscroll="javascript:frameScroll();">
+
+
+   
+<div id="screen" class="data">
+
+<div id="general" class="menu" style="display:none;"><table width="110%"><tr><td id='zoomMenu' menu="zoomFunctions" onmouseout="this.className=''; setNoHighlightForArrow1(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'zoom'); setHighlightForArrow1()" ><script>document.write(properties[selectedLangTag]['wp_view']);</script></td><td id='arrowSign1' menu="zoomFunctions" onmouseout="this.className=''; setNoHighlightForArrow1(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'zoom'); setHighlightForArrow1()"><Span>&#9654</Span></td></tr><tr><td id='printMenu' menu="printFunctions" onmouseout="this.className=''; setNoHighlightForArrow2(); hidePrintFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'print'); setHighlightForArrow2()" ><script>document.write(properties[selectedLangTag]['wp_print']);</script></td><td id='arrowSign2' menu="printFunctions" onmouseout="this.className=''; setNoHighlightForArrow2(); hideZoomFunctions()"  onmouseover="this.className='highlight'; ShowSubMenu(this, 'print'); setHighlightForArrow2()"><Span>&#9654</Span></td></tr></table></div><div id="occ_obj0" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj0')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o03b84233-510c-11d6-8368-0004751947b0', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj1" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj1')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr><tr><td colspan="2" onmouseout="this.className=''" onmouseover="this.className='highlight'" onclick="loadPages('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'occ1')">Problem (Record)</td></tr></table></div><div id="occ1" class="menu" style="display:none;"><table width="100%"><tr><th><script>document.write(properties['es']['wp_assignments']);setAssignForMenu('occ1')</script></th></tr><tr><td colspan="2" onmouseout="this.className=''" onmouseover="this.className='highlight'" onclick="loadPages('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'occ1')">Problem (Record)</td></tr></table></div><div id="occ_obj2" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj2')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obff4bb91-c39b-4fd9-8149-3b1b5a9537c3', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj3" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj3')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('odd966688-bc25-4c83-8bb8-ecea2b5946c4', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj4" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj4')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr><tr><td colspan="2" onmouseout="this.className=''" onmouseover="this.className='highlight'" onclick="loadPages('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'occ4')">Problem (Record)</td></tr></table></div><div id="occ4" class="menu" style="display:none;"><table width="100%"><tr><th><script>document.write(properties['es']['wp_assignments']);setAssignForMenu('occ4')</script></th></tr><tr><td colspan="2" onmouseout="this.className=''" onmouseover="this.className='highlight'" onclick="loadPages('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'occ4')">Problem (Record)</td></tr></table></div><div id="occ_obj5" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj5')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj6" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj6')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o9b069c6b-512a-11d6-8369-0004751947b0', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj7" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj7')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8c0d9292-cead-4841-bdc3-5dbe45021fd4', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj8" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj8')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('ofe049552-1f94-4529-8065-333cd036ac9b', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj9" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj9')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj10" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj10')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o6be00962-73e6-4dc3-b273-de6035f40747', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj11" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj11')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('of5442570-40d4-11d6-8351-0004751947b0', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj12" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj12')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o88544f80-a5b9-4e90-824a-fa53c5fa9e42', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj13" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj13')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('of5442572-40d4-11d6-8351-0004751947b0', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj14" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj14')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj15" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj15')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o24ecb9c8-1620-49a5-8a63-8fbd490212c1', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj16" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj16')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oc4423847-2e09-4b37-9731-4b4d6fe8239e', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj17" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj17')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj18" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj18')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o6f5db7e6-30ed-447a-9a9f-db82e7f24559', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj19" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj19')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o2161b041-c403-4106-81fa-26f7a98ba47f', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj20" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj20')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oc1e2ff84-b7ac-444a-8b89-2f263ad918c0', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj21" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj21')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o53aebb85-96f3-4626-9a16-22c3a7974e0e', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj22" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj22')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o8ee9cf22-8cdc-4981-a9b9-484151c85960', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj23" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj23')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj24" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj24')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj25" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj25')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('oa241dadd-8de6-425e-968d-469da84b42c1', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj26" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj26')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('obceefcd5-cbac-4ba1-ba9a-061bb77d16d9', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj27" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj27')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o48d3c0d7-8d98-4db8-8562-6ab1c767f879', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj28" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj28')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr><tr><td colspan="2" onmouseout="this.className=''" onmouseover="this.className='highlight'" onclick="loadPages('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'occ28')">Problem (Record)</td></tr></table></div><div id="occ28" class="menu" style="display:none;"><table width="100%"><tr><th><script>document.write(properties['es']['wp_assignments']);setAssignForMenu('occ28')</script></th></tr><tr><td colspan="2" onmouseout="this.className=''" onmouseover="this.className='highlight'" onclick="loadPages('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'occ28')">Problem (Record)</td></tr></table></div><div id="occ_obj29" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj29')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('odb12bae4-ef05-4386-b745-7944e21bf9c8', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj30" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj30')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('of5442553-40d4-11d6-8351-0004751947b0', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj31" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj31')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o5cee9abb-dde2-43d4-afae-45b62c82e62b', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div><div id="occ_obj32" class="menu" style="display:none;"><table width="100%"><tr><script>setObjForMenu('occ_obj32')</script><td onmouseout="this.className=''; setHasToHide('true')" onmouseover="this.className='highlight'; setHasToHide('false')"onclick="loadObjectPage('o70893700-d5be-4179-8ce5-a9b7b16e2164', 'general')"><script>document.write(properties[selectedLangTag]['wp_object']);</script></td></tr></table></div>
+
+
+<div>  
+	<map name="ObjectMap25">
+	<area shape="rect" coords="144,253,179,269" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o03b84233-510c-11d6-8368-0004751947b0', 'general')"href="o03b84233-510c-11d6-8368-0004751947b0_inf.htm" alt="Name: Schließungs-
+datum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 16-abr-2002 5:00:18
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"249,80,253,84\" onmouseover=\"setMenu('occ1')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ1')\"/>");</script><area shape="rect" coords="213,64,248,80" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="213,46,248,62" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obff4bb91-c39b-4fd9-8149-3b1b5a9537c3', 'general')"href="obff4bb91-c39b-4fd9-8149-3b1b5a9537c3_inf.htm" alt="Name: RfC
+Description/Definition: Der formale Antrag zur Durchführung eines Change. Ein RFC beinhaltet Details zum beantragten Change und kann auf Papier oder elektronisch erfasst werden. Der Begriff „RFC“ wird häufig fälschlicherweise für einen Change Record oder den Change selbst verwendet.
+Time of generation: 14-nov-2003 7:25:00
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="213,10,248,26" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odd966688-bc25-4c83-8bb8-ecea2b5946c4', 'general')"href="odd966688-bc25-4c83-8bb8-ecea2b5946c4_inf.htm" alt="Name: Incident
+Record
+Description/Definition: Ein Record, der die Details zu einem Incident enthält. Jeder Incident Record dokumentiert den Lebenszyklus eines einzelnen Incident.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"126,53,130,57\" onmouseover=\"setMenu('occ4')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ4')\"/>");</script><area shape="rect" coords="91,37,126,53" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="16,73,51,89" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9', 'general')"href="o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9_inf.htm" alt="Name: Problem-
+Statusnachricht
+Time of generation: 31-oct-2003 7:55:47
+Last change: 09-ene-2008 9:19:34
+"/>
+<area shape="rect" coords="144,217,179,233" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o9b069c6b-512a-11d6-8369-0004751947b0', 'general')"href="o9b069c6b-512a-11d6-8369-0004751947b0_inf.htm" alt="Name: Relevantes SLA
+Description/Definition: Die Service Level-Vereinbarungen, die für die jeweilige Situation (z. B. den aktuellen Incident) gelten.
+Time of generation: 16-abr-2002 8:01:45
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="210,301,245,317" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8c0d9292-cead-4841-bdc3-5dbe45021fd4', 'general')"href="o8c0d9292-cead-4841-bdc3-5dbe45021fd4_inf.htm" alt="Name: Beschreibung der
+permanenten Lösung
+Description/Definition: Die Beschreibung einer Maßnahme oder einer Serie von Maßnahmen, mit denen ein Problem (voraussichtlich) dauerhaft behoben werden kann.
+Time of generation: 23-oct-2003 9:45:49
+Last change: 09-ene-2008 11:28:41
+"/>
+<area shape="rect" coords="294,184,329,200" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ofe049552-1f94-4529-8065-333cd036ac9b', 'general')"href="ofe049552-1f94-4529-8065-333cd036ac9b_inf.htm" alt="Name: Ausgesetzt
+Time of generation: 23-oct-2003 12:12:39
+Last change: 15-mar-2008 9:08:31
+"/>
+<area shape="rect" coords="210,283,245,299" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed', 'general')"href="o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed_inf.htm" alt="Name: Workaround-
+Beschreibung
+Time of generation: 23-oct-2003 9:44:08
+Last change: 08-feb-2008 11:56:19
+"/>
+<area shape="rect" coords="294,166,329,182" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6be00962-73e6-4dc3-b273-de6035f40747', 'general')"href="o6be00962-73e6-4dc3-b273-de6035f40747_inf.htm" alt="Name: Geschlossen
+Time of generation: 27-oct-2003 12:58:41
+Last change: 15-mar-2008 9:36:03
+"/>
+<area shape="rect" coords="294,148,329,164" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442570-40d4-11d6-8351-0004751947b0', 'general')"href="of5442570-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Known Error
+Description/Definition: Ein Problem, für das die zugrunde liegende Ursache und ein Workaround dokumentiert wurden. Das Problem Management ist verantwortlich für die Erstellung und Verwaltung von bekannten Fehlern während ihres gesamten Lebenszyklus. Bekannte Fehler können auch von der Entwicklung oder den Suppliern identifiziert werden..
+Time of generation: 26-mar-2002 12:50:14
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="294,130,329,146" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o88544f80-a5b9-4e90-824a-fa53c5fa9e42', 'general')"href="o88544f80-a5b9-4e90-824a-fa53c5fa9e42_inf.htm" alt="Name: Offen
+Time of generation: 20-oct-2003 7:23:56
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="234,265,269,281" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442572-40d4-11d6-8351-0004751947b0', 'general')"href="of5442572-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: SLA
+Description/Definition: (Service Level Vereinbarung)
+Eine Vereinbarung zwischen einem IT Service Provider und einem Kunden. Das SLA beschreibt den jeweiligen IT Service, dokumentiert Service Level Ziele und legt die Verantwortlichkeiten des IT Service Providers und des Kunden fest. Ein einzelnes SLA kann mehrere IT Services oder mehrere Kunden abdecken.
+Time of generation: 26-mar-2002 12:52:31
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="306,226,341,242" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989', 'general')"href="o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989_inf.htm" alt="Name: Serviceauswirkung
+Description/Definition: Die Serviceauswirkung wird ermittelt durch die Anzahl und Priorität der Incidents, die dem Problem- oder dem Known-Error-Record hinzugefügt wurden.
+Time of generation: 13-oct-2003 15:40:56
+Last change: 09-ene-2008 9:19:36
+"/>
+<area shape="rect" coords="213,28,248,44" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o24ecb9c8-1620-49a5-8a63-8fbd490212c1', 'general')"href="o24ecb9c8-1620-49a5-8a63-8fbd490212c1_inf.htm" alt="Name: Configuration
+Item
+Description/Definition: Alle Komponenten, die verwaltet werden müssen, um einen IT Service bereitstellen zu können. Informationen zu den einzelnen CIs werden in einem Configuration Record innerhalb des Configuration Management Systems erfasst und über den gesamten Lebenszyklus hinweg vom Configuration Management verwaltet. CIs unterstehen der Steuerung und Kontrolle des Change Management. CIs umfassen vor allem IT Services, Hardware, Software, Gebäude, Personen und formale Dokumentationen, beispielsweise zum Prozess und SLAs.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 06-nov-2009 9:57:54
+"/>
+<area shape="rect" coords="135,38,164,53" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4423847-2e09-4b37-9731-4b4d6fe8239e', 'general')"href="oc4423847-2e09-4b37-9731-4b4d6fe8239e_inf.htm" alt="Name: kann
+verknüpft sein mit
+Description/Definition: Diese Beziehungen werden automatisch erstellt.
+Time of generation: 13-oct-2003 10:58:28
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="144,199,179,215" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb', 'general')"href="o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb_inf.htm" alt="Name: Betroffener
+Service
+Description/Definition: Sollte aus dem Servicekatalog des aktuellen Kunden ausgewählt werden.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="144,235,179,251" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6f5db7e6-30ed-447a-9a9f-db82e7f24559', 'general')"href="o6f5db7e6-30ed-447a-9a9f-db82e7f24559_inf.htm" alt="Name: Aktions-
+protokoll
+Description/Definition: Die Auflistung aller Maßnahmen, die aufgrund eines bestimmten Incidents, eines bestimmten Problems, einer bestimmten Änderung usw. ergriffen wurden.
+Last change: 07-feb-2008 10:56:54
+"/>
+<area shape="rect" coords="267,112,302,128" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2161b041-c403-4106-81fa-26f7a98ba47f', 'general')"href="o2161b041-c403-4106-81fa-26f7a98ba47f_inf.htm" alt="Name: Problemstatus
+Description/Definition: z. B.
+-Offen
+-Geplant
+-Einem Experten zugeteilt bzw. an diesen weitergeleitet
+-Laufende Arbeit
+-Ausgesetzt
+-Geschlossen
+Time of generation: 10-oct-2003 13:40:41
+Last change: 15-mar-2008 9:50:33
+"/>
+<area shape="rect" coords="144,181,179,197" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc1e2ff84-b7ac-444a-8b89-2f263ad918c0', 'general')"href="oc1e2ff84-b7ac-444a-8b89-2f263ad918c0_inf.htm" alt="Name: Problem-Symptom-
+beschreibung
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:03:00
+"/>
+<area shape="rect" coords="144,163,179,179" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o53aebb85-96f3-4626-9a16-22c3a7974e0e', 'general')"href="o53aebb85-96f3-4626-9a16-22c3a7974e0e_inf.htm" alt="Name: Bearbeitender
+Mitarbeiter
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="144,145,179,161" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8ee9cf22-8cdc-4981-a9b9-484151c85960', 'general')"href="o8ee9cf22-8cdc-4981-a9b9-484151c85960_inf.htm" alt="Name: Erstelldatum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="115,98,144,113" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e', 'general')"href="o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e_inf.htm" alt="Name: enthält
+Time of generation: 28-oct-2003 12:18:01
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="210,127,245,143" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c', 'general')"href="oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c_inf.htm" alt="Name: Problemtyp
+Description/Definition: z. B. Software
+  - Office-Anwendung
+  - Business-Anwendung
+ Hardware 
+  - EDV-Anlage
+  - Großrechner
+  - Arbeitsplatzrechner
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="144,127,179,143" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa241dadd-8de6-425e-968d-469da84b42c1', 'general')"href="oa241dadd-8de6-425e-968d-469da84b42c1_inf.htm" alt="Name: Problem Record ID
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 09-ene-2008 9:19:33
+"/>
+<area shape="rect" coords="234,148,269,164" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obceefcd5-cbac-4ba1-ba9a-061bb77d16d9', 'general')"href="obceefcd5-cbac-4ba1-ba9a-061bb77d16d9_inf.htm" alt="Name: Live-Problem
+Description/Definition: Ein Problem, das in der realen betrieblichen Infrastruktur auftritt.
+Time of generation: 20-oct-2003 7:22:21
+Last change: 07-feb-2008 11:00:34
+"/>
+<area shape="rect" coords="234,166,269,182" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o48d3c0d7-8d98-4db8-8562-6ab1c767f879', 'general')"href="o48d3c0d7-8d98-4db8-8562-6ab1c767f879_inf.htm" alt="Name: Entwicklungs-
+problem
+Description/Definition: Ein Problem, das in anderen Prozessen erkannt wurde (z. B. während der Anwendungsentwicklung), jedoch nicht im realen betrieblichen Umfeld auftritt.
+Time of generation: 20-oct-2003 7:22:32
+Last change: 07-feb-2008 11:00:33
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"51,53,55,57\" onmouseover=\"setMenu('occ28')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ28')\"/>");</script><area shape="rect" coords="16,37,51,53" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68', 'general')"href="o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68_inf.htm" alt="Name: Problem
+Description/Definition: Die Ursache für einen oder mehrere Incidents. Zum Zeitpunkt der Erstellung eines Problem Record ist die Ursache in der Regel unbekannt. Für die weitere Untersuchung ist der Problem Management Prozess verantwortlich.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="234,247,269,263" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odb12bae4-ef05-4386-b745-7944e21bf9c8', 'general')"href="odb12bae4-ef05-4386-b745-7944e21bf9c8_inf.htm" alt="Name: Dringlichkeit
+Description/Definition: Ein Wert, der wiedergibt, wie lange es dauert, bis ein Incident, Problem oder Change maßgebliche Auswirkungen auf das Business hat. Ein Incident mit erheblichen Auswirkungen kann beispielsweise von geringer Dringlichkeit sein, wenn die Auswirkungen das Business bis zum Ende des Geschäftsjahrs nicht beeinträchtigen. Auf der Grundlage der Auswirkung und Dringlichkeit werden Prioritäten zugewiesen.
+Time of generation: 10-oct-2003 13:02:42
+Last change: 09-ene-2008 11:28:43
+"/>
+<area shape="rect" coords="234,229,269,245" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442553-40d4-11d6-8351-0004751947b0', 'general')"href="of5442553-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Impact
+Description/Definition: Maß dafür, wie geschäftskritisch ein Incident, ein Problem oder ein Änderungsantrag für ein Unternehmen ist. Kann oftmals gleichgesetzt werden mit der Abweichung von vereinbarten oder erwarteten Service Levels.
+Time of generation: 26-mar-2002 12:20:41
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="210,187,245,203" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5cee9abb-dde2-43d4-afae-45b62c82e62b', 'general')"href="o5cee9abb-dde2-43d4-afae-45b62c82e62b_inf.htm" alt="Name: Problem-
+kategorie
+Description/Definition: Beispielkategorien für Probleme:
+- Software 
+-Textverarbeitung
+-Tabellenkalkulation
+-Business-Anwendung
+- Hardware 
+-EDV-Anlage
+-Großrechner
+-Arbeitsplatzrechner
+Time of generation: 29-oct-2003 7:30:55
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="210,208,245,224" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o70893700-d5be-4179-8ce5-a9b7b16e2164', 'general')"href="o70893700-d5be-4179-8ce5-a9b7b16e2164_inf.htm" alt="Name: Problem-
+priorität
+Description/Definition: Reihenfolge, in der ein Problem gelöst werden muss. Dabei sollten Probleme, die zu ernsthaften Störungen von betrieblichen Abläufen führen können, vorrangig gelöst werden.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 06-nov-2009 9:57:57
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap50">
+	<area shape="rect" coords="289,506,359,537" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o03b84233-510c-11d6-8368-0004751947b0', 'general')"href="o03b84233-510c-11d6-8368-0004751947b0_inf.htm" alt="Name: Schließungs-
+datum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 16-abr-2002 5:00:18
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"498,160,506,168\" onmouseover=\"setMenu('occ1')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ1')\"/>");</script><area shape="rect" coords="427,128,497,159" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="427,92,497,123" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obff4bb91-c39b-4fd9-8149-3b1b5a9537c3', 'general')"href="obff4bb91-c39b-4fd9-8149-3b1b5a9537c3_inf.htm" alt="Name: RfC
+Description/Definition: Der formale Antrag zur Durchführung eines Change. Ein RFC beinhaltet Details zum beantragten Change und kann auf Papier oder elektronisch erfasst werden. Der Begriff „RFC“ wird häufig fälschlicherweise für einen Change Record oder den Change selbst verwendet.
+Time of generation: 14-nov-2003 7:25:00
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="427,20,497,51" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odd966688-bc25-4c83-8bb8-ecea2b5946c4', 'general')"href="odd966688-bc25-4c83-8bb8-ecea2b5946c4_inf.htm" alt="Name: Incident
+Record
+Description/Definition: Ein Record, der die Details zu einem Incident enthält. Jeder Incident Record dokumentiert den Lebenszyklus eines einzelnen Incident.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"252,107,260,115\" onmouseover=\"setMenu('occ4')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ4')\"/>");</script><area shape="rect" coords="181,74,251,105" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="31,146,101,177" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9', 'general')"href="o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9_inf.htm" alt="Name: Problem-
+Statusnachricht
+Time of generation: 31-oct-2003 7:55:47
+Last change: 09-ene-2008 9:19:34
+"/>
+<area shape="rect" coords="289,434,359,465" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o9b069c6b-512a-11d6-8369-0004751947b0', 'general')"href="o9b069c6b-512a-11d6-8369-0004751947b0_inf.htm" alt="Name: Relevantes SLA
+Description/Definition: Die Service Level-Vereinbarungen, die für die jeweilige Situation (z. B. den aktuellen Incident) gelten.
+Time of generation: 16-abr-2002 8:01:45
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="421,602,491,633" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8c0d9292-cead-4841-bdc3-5dbe45021fd4', 'general')"href="o8c0d9292-cead-4841-bdc3-5dbe45021fd4_inf.htm" alt="Name: Beschreibung der
+permanenten Lösung
+Description/Definition: Die Beschreibung einer Maßnahme oder einer Serie von Maßnahmen, mit denen ein Problem (voraussichtlich) dauerhaft behoben werden kann.
+Time of generation: 23-oct-2003 9:45:49
+Last change: 09-ene-2008 11:28:41
+"/>
+<area shape="rect" coords="589,368,659,399" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ofe049552-1f94-4529-8065-333cd036ac9b', 'general')"href="ofe049552-1f94-4529-8065-333cd036ac9b_inf.htm" alt="Name: Ausgesetzt
+Time of generation: 23-oct-2003 12:12:39
+Last change: 15-mar-2008 9:08:31
+"/>
+<area shape="rect" coords="421,566,491,597" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed', 'general')"href="o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed_inf.htm" alt="Name: Workaround-
+Beschreibung
+Time of generation: 23-oct-2003 9:44:08
+Last change: 08-feb-2008 11:56:19
+"/>
+<area shape="rect" coords="589,332,659,363" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6be00962-73e6-4dc3-b273-de6035f40747', 'general')"href="o6be00962-73e6-4dc3-b273-de6035f40747_inf.htm" alt="Name: Geschlossen
+Time of generation: 27-oct-2003 12:58:41
+Last change: 15-mar-2008 9:36:03
+"/>
+<area shape="rect" coords="589,296,659,327" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442570-40d4-11d6-8351-0004751947b0', 'general')"href="of5442570-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Known Error
+Description/Definition: Ein Problem, für das die zugrunde liegende Ursache und ein Workaround dokumentiert wurden. Das Problem Management ist verantwortlich für die Erstellung und Verwaltung von bekannten Fehlern während ihres gesamten Lebenszyklus. Bekannte Fehler können auch von der Entwicklung oder den Suppliern identifiziert werden..
+Time of generation: 26-mar-2002 12:50:14
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="589,260,659,291" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o88544f80-a5b9-4e90-824a-fa53c5fa9e42', 'general')"href="o88544f80-a5b9-4e90-824a-fa53c5fa9e42_inf.htm" alt="Name: Offen
+Time of generation: 20-oct-2003 7:23:56
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="469,530,539,561" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442572-40d4-11d6-8351-0004751947b0', 'general')"href="of5442572-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: SLA
+Description/Definition: (Service Level Vereinbarung)
+Eine Vereinbarung zwischen einem IT Service Provider und einem Kunden. Das SLA beschreibt den jeweiligen IT Service, dokumentiert Service Level Ziele und legt die Verantwortlichkeiten des IT Service Providers und des Kunden fest. Ein einzelnes SLA kann mehrere IT Services oder mehrere Kunden abdecken.
+Time of generation: 26-mar-2002 12:52:31
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="613,452,683,483" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989', 'general')"href="o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989_inf.htm" alt="Name: Serviceauswirkung
+Description/Definition: Die Serviceauswirkung wird ermittelt durch die Anzahl und Priorität der Incidents, die dem Problem- oder dem Known-Error-Record hinzugefügt wurden.
+Time of generation: 13-oct-2003 15:40:56
+Last change: 09-ene-2008 9:19:36
+"/>
+<area shape="rect" coords="427,56,497,87" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o24ecb9c8-1620-49a5-8a63-8fbd490212c1', 'general')"href="o24ecb9c8-1620-49a5-8a63-8fbd490212c1_inf.htm" alt="Name: Configuration
+Item
+Description/Definition: Alle Komponenten, die verwaltet werden müssen, um einen IT Service bereitstellen zu können. Informationen zu den einzelnen CIs werden in einem Configuration Record innerhalb des Configuration Management Systems erfasst und über den gesamten Lebenszyklus hinweg vom Configuration Management verwaltet. CIs unterstehen der Steuerung und Kontrolle des Change Management. CIs umfassen vor allem IT Services, Hardware, Software, Gebäude, Personen und formale Dokumentationen, beispielsweise zum Prozess und SLAs.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 06-nov-2009 9:57:54
+"/>
+<area shape="rect" coords="271,75,329,105" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4423847-2e09-4b37-9731-4b4d6fe8239e', 'general')"href="oc4423847-2e09-4b37-9731-4b4d6fe8239e_inf.htm" alt="Name: kann
+verknüpft sein mit
+Description/Definition: Diese Beziehungen werden automatisch erstellt.
+Time of generation: 13-oct-2003 10:58:28
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="289,398,359,429" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb', 'general')"href="o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb_inf.htm" alt="Name: Betroffener
+Service
+Description/Definition: Sollte aus dem Servicekatalog des aktuellen Kunden ausgewählt werden.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="289,470,359,501" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6f5db7e6-30ed-447a-9a9f-db82e7f24559', 'general')"href="o6f5db7e6-30ed-447a-9a9f-db82e7f24559_inf.htm" alt="Name: Aktions-
+protokoll
+Description/Definition: Die Auflistung aller Maßnahmen, die aufgrund eines bestimmten Incidents, eines bestimmten Problems, einer bestimmten Änderung usw. ergriffen wurden.
+Last change: 07-feb-2008 10:56:54
+"/>
+<area shape="rect" coords="535,224,605,255" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2161b041-c403-4106-81fa-26f7a98ba47f', 'general')"href="o2161b041-c403-4106-81fa-26f7a98ba47f_inf.htm" alt="Name: Problemstatus
+Description/Definition: z. B.
+-Offen
+-Geplant
+-Einem Experten zugeteilt bzw. an diesen weitergeleitet
+-Laufende Arbeit
+-Ausgesetzt
+-Geschlossen
+Time of generation: 10-oct-2003 13:40:41
+Last change: 15-mar-2008 9:50:33
+"/>
+<area shape="rect" coords="289,362,359,393" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc1e2ff84-b7ac-444a-8b89-2f263ad918c0', 'general')"href="oc1e2ff84-b7ac-444a-8b89-2f263ad918c0_inf.htm" alt="Name: Problem-Symptom-
+beschreibung
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:03:00
+"/>
+<area shape="rect" coords="289,326,359,357" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o53aebb85-96f3-4626-9a16-22c3a7974e0e', 'general')"href="o53aebb85-96f3-4626-9a16-22c3a7974e0e_inf.htm" alt="Name: Bearbeitender
+Mitarbeiter
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="289,290,359,321" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8ee9cf22-8cdc-4981-a9b9-484151c85960', 'general')"href="o8ee9cf22-8cdc-4981-a9b9-484151c85960_inf.htm" alt="Name: Erstelldatum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="229,195,287,225" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e', 'general')"href="o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e_inf.htm" alt="Name: enthält
+Time of generation: 28-oct-2003 12:18:01
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="421,254,491,285" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c', 'general')"href="oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c_inf.htm" alt="Name: Problemtyp
+Description/Definition: z. B. Software
+  - Office-Anwendung
+  - Business-Anwendung
+ Hardware 
+  - EDV-Anlage
+  - Großrechner
+  - Arbeitsplatzrechner
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="289,254,359,285" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa241dadd-8de6-425e-968d-469da84b42c1', 'general')"href="oa241dadd-8de6-425e-968d-469da84b42c1_inf.htm" alt="Name: Problem Record ID
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 09-ene-2008 9:19:33
+"/>
+<area shape="rect" coords="469,296,539,327" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obceefcd5-cbac-4ba1-ba9a-061bb77d16d9', 'general')"href="obceefcd5-cbac-4ba1-ba9a-061bb77d16d9_inf.htm" alt="Name: Live-Problem
+Description/Definition: Ein Problem, das in der realen betrieblichen Infrastruktur auftritt.
+Time of generation: 20-oct-2003 7:22:21
+Last change: 07-feb-2008 11:00:34
+"/>
+<area shape="rect" coords="469,332,539,363" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o48d3c0d7-8d98-4db8-8562-6ab1c767f879', 'general')"href="o48d3c0d7-8d98-4db8-8562-6ab1c767f879_inf.htm" alt="Name: Entwicklungs-
+problem
+Description/Definition: Ein Problem, das in anderen Prozessen erkannt wurde (z. B. während der Anwendungsentwicklung), jedoch nicht im realen betrieblichen Umfeld auftritt.
+Time of generation: 20-oct-2003 7:22:32
+Last change: 07-feb-2008 11:00:33
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"102,107,110,115\" onmouseover=\"setMenu('occ28')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ28')\"/>");</script><area shape="rect" coords="31,74,101,105" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68', 'general')"href="o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68_inf.htm" alt="Name: Problem
+Description/Definition: Die Ursache für einen oder mehrere Incidents. Zum Zeitpunkt der Erstellung eines Problem Record ist die Ursache in der Regel unbekannt. Für die weitere Untersuchung ist der Problem Management Prozess verantwortlich.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="469,494,539,525" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odb12bae4-ef05-4386-b745-7944e21bf9c8', 'general')"href="odb12bae4-ef05-4386-b745-7944e21bf9c8_inf.htm" alt="Name: Dringlichkeit
+Description/Definition: Ein Wert, der wiedergibt, wie lange es dauert, bis ein Incident, Problem oder Change maßgebliche Auswirkungen auf das Business hat. Ein Incident mit erheblichen Auswirkungen kann beispielsweise von geringer Dringlichkeit sein, wenn die Auswirkungen das Business bis zum Ende des Geschäftsjahrs nicht beeinträchtigen. Auf der Grundlage der Auswirkung und Dringlichkeit werden Prioritäten zugewiesen.
+Time of generation: 10-oct-2003 13:02:42
+Last change: 09-ene-2008 11:28:43
+"/>
+<area shape="rect" coords="469,458,539,489" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442553-40d4-11d6-8351-0004751947b0', 'general')"href="of5442553-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Impact
+Description/Definition: Maß dafür, wie geschäftskritisch ein Incident, ein Problem oder ein Änderungsantrag für ein Unternehmen ist. Kann oftmals gleichgesetzt werden mit der Abweichung von vereinbarten oder erwarteten Service Levels.
+Time of generation: 26-mar-2002 12:20:41
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="421,374,491,405" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5cee9abb-dde2-43d4-afae-45b62c82e62b', 'general')"href="o5cee9abb-dde2-43d4-afae-45b62c82e62b_inf.htm" alt="Name: Problem-
+kategorie
+Description/Definition: Beispielkategorien für Probleme:
+- Software 
+-Textverarbeitung
+-Tabellenkalkulation
+-Business-Anwendung
+- Hardware 
+-EDV-Anlage
+-Großrechner
+-Arbeitsplatzrechner
+Time of generation: 29-oct-2003 7:30:55
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="421,416,491,447" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o70893700-d5be-4179-8ce5-a9b7b16e2164', 'general')"href="o70893700-d5be-4179-8ce5-a9b7b16e2164_inf.htm" alt="Name: Problem-
+priorität
+Description/Definition: Reihenfolge, in der ein Problem gelöst werden muss. Dabei sollten Probleme, die zu ernsthaften Störungen von betrieblichen Abläufen führen können, vorrangig gelöst werden.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 06-nov-2009 9:57:57
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap100">
+	<area shape="rect" coords="578,1012,717,1074" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o03b84233-510c-11d6-8368-0004751947b0', 'general')"href="o03b84233-510c-11d6-8368-0004751947b0_inf.htm" alt="Name: Schließungs-
+datum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 16-abr-2002 5:00:18
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"995,321,1011,337\" onmouseover=\"setMenu('occ1')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ1')\"/>");</script><area shape="rect" coords="854,257,993,319" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="854,185,993,247" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obff4bb91-c39b-4fd9-8149-3b1b5a9537c3', 'general')"href="obff4bb91-c39b-4fd9-8149-3b1b5a9537c3_inf.htm" alt="Name: RfC
+Description/Definition: Der formale Antrag zur Durchführung eines Change. Ein RFC beinhaltet Details zum beantragten Change und kann auf Papier oder elektronisch erfasst werden. Der Begriff „RFC“ wird häufig fälschlicherweise für einen Change Record oder den Change selbst verwendet.
+Time of generation: 14-nov-2003 7:25:00
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="854,41,993,103" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odd966688-bc25-4c83-8bb8-ecea2b5946c4', 'general')"href="odd966688-bc25-4c83-8bb8-ecea2b5946c4_inf.htm" alt="Name: Incident
+Record
+Description/Definition: Ein Record, der die Details zu einem Incident enthält. Jeder Incident Record dokumentiert den Lebenszyklus eines einzelnen Incident.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"504,213,520,229\" onmouseover=\"setMenu('occ4')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ4')\"/>");</script><area shape="rect" coords="362,149,501,211" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="62,293,201,355" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9', 'general')"href="o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9_inf.htm" alt="Name: Problem-
+Statusnachricht
+Time of generation: 31-oct-2003 7:55:47
+Last change: 09-ene-2008 9:19:34
+"/>
+<area shape="rect" coords="578,868,717,930" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o9b069c6b-512a-11d6-8369-0004751947b0', 'general')"href="o9b069c6b-512a-11d6-8369-0004751947b0_inf.htm" alt="Name: Relevantes SLA
+Description/Definition: Die Service Level-Vereinbarungen, die für die jeweilige Situation (z. B. den aktuellen Incident) gelten.
+Time of generation: 16-abr-2002 8:01:45
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="842,1204,981,1266" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8c0d9292-cead-4841-bdc3-5dbe45021fd4', 'general')"href="o8c0d9292-cead-4841-bdc3-5dbe45021fd4_inf.htm" alt="Name: Beschreibung der
+permanenten Lösung
+Description/Definition: Die Beschreibung einer Maßnahme oder einer Serie von Maßnahmen, mit denen ein Problem (voraussichtlich) dauerhaft behoben werden kann.
+Time of generation: 23-oct-2003 9:45:49
+Last change: 09-ene-2008 11:28:41
+"/>
+<area shape="rect" coords="1177,736,1316,798" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ofe049552-1f94-4529-8065-333cd036ac9b', 'general')"href="ofe049552-1f94-4529-8065-333cd036ac9b_inf.htm" alt="Name: Ausgesetzt
+Time of generation: 23-oct-2003 12:12:39
+Last change: 15-mar-2008 9:08:31
+"/>
+<area shape="rect" coords="842,1132,981,1194" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed', 'general')"href="o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed_inf.htm" alt="Name: Workaround-
+Beschreibung
+Time of generation: 23-oct-2003 9:44:08
+Last change: 08-feb-2008 11:56:19
+"/>
+<area shape="rect" coords="1177,664,1316,726" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6be00962-73e6-4dc3-b273-de6035f40747', 'general')"href="o6be00962-73e6-4dc3-b273-de6035f40747_inf.htm" alt="Name: Geschlossen
+Time of generation: 27-oct-2003 12:58:41
+Last change: 15-mar-2008 9:36:03
+"/>
+<area shape="rect" coords="1177,592,1316,654" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442570-40d4-11d6-8351-0004751947b0', 'general')"href="of5442570-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Known Error
+Description/Definition: Ein Problem, für das die zugrunde liegende Ursache und ein Workaround dokumentiert wurden. Das Problem Management ist verantwortlich für die Erstellung und Verwaltung von bekannten Fehlern während ihres gesamten Lebenszyklus. Bekannte Fehler können auch von der Entwicklung oder den Suppliern identifiziert werden..
+Time of generation: 26-mar-2002 12:50:14
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="1177,520,1316,582" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o88544f80-a5b9-4e90-824a-fa53c5fa9e42', 'general')"href="o88544f80-a5b9-4e90-824a-fa53c5fa9e42_inf.htm" alt="Name: Offen
+Time of generation: 20-oct-2003 7:23:56
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="938,1060,1077,1122" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442572-40d4-11d6-8351-0004751947b0', 'general')"href="of5442572-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: SLA
+Description/Definition: (Service Level Vereinbarung)
+Eine Vereinbarung zwischen einem IT Service Provider und einem Kunden. Das SLA beschreibt den jeweiligen IT Service, dokumentiert Service Level Ziele und legt die Verantwortlichkeiten des IT Service Providers und des Kunden fest. Ein einzelnes SLA kann mehrere IT Services oder mehrere Kunden abdecken.
+Time of generation: 26-mar-2002 12:52:31
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="1225,904,1364,966" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989', 'general')"href="o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989_inf.htm" alt="Name: Serviceauswirkung
+Description/Definition: Die Serviceauswirkung wird ermittelt durch die Anzahl und Priorität der Incidents, die dem Problem- oder dem Known-Error-Record hinzugefügt wurden.
+Time of generation: 13-oct-2003 15:40:56
+Last change: 09-ene-2008 9:19:36
+"/>
+<area shape="rect" coords="854,113,993,175" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o24ecb9c8-1620-49a5-8a63-8fbd490212c1', 'general')"href="o24ecb9c8-1620-49a5-8a63-8fbd490212c1_inf.htm" alt="Name: Configuration
+Item
+Description/Definition: Alle Komponenten, die verwaltet werden müssen, um einen IT Service bereitstellen zu können. Informationen zu den einzelnen CIs werden in einem Configuration Record innerhalb des Configuration Management Systems erfasst und über den gesamten Lebenszyklus hinweg vom Configuration Management verwaltet. CIs unterstehen der Steuerung und Kontrolle des Change Management. CIs umfassen vor allem IT Services, Hardware, Software, Gebäude, Personen und formale Dokumentationen, beispielsweise zum Prozess und SLAs.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 06-nov-2009 9:57:54
+"/>
+<area shape="rect" coords="542,150,657,210" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4423847-2e09-4b37-9731-4b4d6fe8239e', 'general')"href="oc4423847-2e09-4b37-9731-4b4d6fe8239e_inf.htm" alt="Name: kann
+verknüpft sein mit
+Description/Definition: Diese Beziehungen werden automatisch erstellt.
+Time of generation: 13-oct-2003 10:58:28
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="578,796,717,858" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb', 'general')"href="o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb_inf.htm" alt="Name: Betroffener
+Service
+Description/Definition: Sollte aus dem Servicekatalog des aktuellen Kunden ausgewählt werden.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="578,940,717,1002" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6f5db7e6-30ed-447a-9a9f-db82e7f24559', 'general')"href="o6f5db7e6-30ed-447a-9a9f-db82e7f24559_inf.htm" alt="Name: Aktions-
+protokoll
+Description/Definition: Die Auflistung aller Maßnahmen, die aufgrund eines bestimmten Incidents, eines bestimmten Problems, einer bestimmten Änderung usw. ergriffen wurden.
+Last change: 07-feb-2008 10:56:54
+"/>
+<area shape="rect" coords="1070,448,1209,510" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2161b041-c403-4106-81fa-26f7a98ba47f', 'general')"href="o2161b041-c403-4106-81fa-26f7a98ba47f_inf.htm" alt="Name: Problemstatus
+Description/Definition: z. B.
+-Offen
+-Geplant
+-Einem Experten zugeteilt bzw. an diesen weitergeleitet
+-Laufende Arbeit
+-Ausgesetzt
+-Geschlossen
+Time of generation: 10-oct-2003 13:40:41
+Last change: 15-mar-2008 9:50:33
+"/>
+<area shape="rect" coords="578,724,717,786" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc1e2ff84-b7ac-444a-8b89-2f263ad918c0', 'general')"href="oc1e2ff84-b7ac-444a-8b89-2f263ad918c0_inf.htm" alt="Name: Problem-Symptom-
+beschreibung
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:03:00
+"/>
+<area shape="rect" coords="578,652,717,714" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o53aebb85-96f3-4626-9a16-22c3a7974e0e', 'general')"href="o53aebb85-96f3-4626-9a16-22c3a7974e0e_inf.htm" alt="Name: Bearbeitender
+Mitarbeiter
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="578,580,717,642" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8ee9cf22-8cdc-4981-a9b9-484151c85960', 'general')"href="o8ee9cf22-8cdc-4981-a9b9-484151c85960_inf.htm" alt="Name: Erstelldatum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="458,390,573,450" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e', 'general')"href="o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e_inf.htm" alt="Name: enthält
+Time of generation: 28-oct-2003 12:18:01
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="842,508,981,570" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c', 'general')"href="oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c_inf.htm" alt="Name: Problemtyp
+Description/Definition: z. B. Software
+  - Office-Anwendung
+  - Business-Anwendung
+ Hardware 
+  - EDV-Anlage
+  - Großrechner
+  - Arbeitsplatzrechner
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="578,508,717,570" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa241dadd-8de6-425e-968d-469da84b42c1', 'general')"href="oa241dadd-8de6-425e-968d-469da84b42c1_inf.htm" alt="Name: Problem Record ID
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 09-ene-2008 9:19:33
+"/>
+<area shape="rect" coords="938,592,1077,654" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obceefcd5-cbac-4ba1-ba9a-061bb77d16d9', 'general')"href="obceefcd5-cbac-4ba1-ba9a-061bb77d16d9_inf.htm" alt="Name: Live-Problem
+Description/Definition: Ein Problem, das in der realen betrieblichen Infrastruktur auftritt.
+Time of generation: 20-oct-2003 7:22:21
+Last change: 07-feb-2008 11:00:34
+"/>
+<area shape="rect" coords="938,664,1077,726" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o48d3c0d7-8d98-4db8-8562-6ab1c767f879', 'general')"href="o48d3c0d7-8d98-4db8-8562-6ab1c767f879_inf.htm" alt="Name: Entwicklungs-
+problem
+Description/Definition: Ein Problem, das in anderen Prozessen erkannt wurde (z. B. während der Anwendungsentwicklung), jedoch nicht im realen betrieblichen Umfeld auftritt.
+Time of generation: 20-oct-2003 7:22:32
+Last change: 07-feb-2008 11:00:33
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"204,213,220,229\" onmouseover=\"setMenu('occ28')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ28')\"/>");</script><area shape="rect" coords="62,149,201,211" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68', 'general')"href="o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68_inf.htm" alt="Name: Problem
+Description/Definition: Die Ursache für einen oder mehrere Incidents. Zum Zeitpunkt der Erstellung eines Problem Record ist die Ursache in der Regel unbekannt. Für die weitere Untersuchung ist der Problem Management Prozess verantwortlich.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="938,988,1077,1050" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odb12bae4-ef05-4386-b745-7944e21bf9c8', 'general')"href="odb12bae4-ef05-4386-b745-7944e21bf9c8_inf.htm" alt="Name: Dringlichkeit
+Description/Definition: Ein Wert, der wiedergibt, wie lange es dauert, bis ein Incident, Problem oder Change maßgebliche Auswirkungen auf das Business hat. Ein Incident mit erheblichen Auswirkungen kann beispielsweise von geringer Dringlichkeit sein, wenn die Auswirkungen das Business bis zum Ende des Geschäftsjahrs nicht beeinträchtigen. Auf der Grundlage der Auswirkung und Dringlichkeit werden Prioritäten zugewiesen.
+Time of generation: 10-oct-2003 13:02:42
+Last change: 09-ene-2008 11:28:43
+"/>
+<area shape="rect" coords="938,916,1077,978" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442553-40d4-11d6-8351-0004751947b0', 'general')"href="of5442553-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Impact
+Description/Definition: Maß dafür, wie geschäftskritisch ein Incident, ein Problem oder ein Änderungsantrag für ein Unternehmen ist. Kann oftmals gleichgesetzt werden mit der Abweichung von vereinbarten oder erwarteten Service Levels.
+Time of generation: 26-mar-2002 12:20:41
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="842,748,981,810" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5cee9abb-dde2-43d4-afae-45b62c82e62b', 'general')"href="o5cee9abb-dde2-43d4-afae-45b62c82e62b_inf.htm" alt="Name: Problem-
+kategorie
+Description/Definition: Beispielkategorien für Probleme:
+- Software 
+-Textverarbeitung
+-Tabellenkalkulation
+-Business-Anwendung
+- Hardware 
+-EDV-Anlage
+-Großrechner
+-Arbeitsplatzrechner
+Time of generation: 29-oct-2003 7:30:55
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="842,832,981,894" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o70893700-d5be-4179-8ce5-a9b7b16e2164', 'general')"href="o70893700-d5be-4179-8ce5-a9b7b16e2164_inf.htm" alt="Name: Problem-
+priorität
+Description/Definition: Reihenfolge, in der ein Problem gelöst werden muss. Dabei sollten Probleme, die zu ernsthaften Störungen von betrieblichen Abläufen führen können, vorrangig gelöst werden.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 06-nov-2009 9:57:57
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+<map name="ObjectMap125">
+	<area shape="rect" coords="722,1265,896,1343" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj0'); setObjMenu('occ_obj0')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o03b84233-510c-11d6-8368-0004751947b0', 'general')"href="o03b84233-510c-11d6-8368-0004751947b0_inf.htm" alt="Name: Schließungs-
+datum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 16-abr-2002 5:00:18
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"1244,401,1264,421\" onmouseover=\"setMenu('occ1')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ1')\"/>");</script><area shape="rect" coords="1067,321,1241,399" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj1'); setObjMenu('occ_obj1')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="1067,231,1241,309" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj2'); setObjMenu('occ_obj2')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obff4bb91-c39b-4fd9-8149-3b1b5a9537c3', 'general')"href="obff4bb91-c39b-4fd9-8149-3b1b5a9537c3_inf.htm" alt="Name: RfC
+Description/Definition: Der formale Antrag zur Durchführung eines Change. Ein RFC beinhaltet Details zum beantragten Change und kann auf Papier oder elektronisch erfasst werden. Der Begriff „RFC“ wird häufig fälschlicherweise für einen Change Record oder den Change selbst verwendet.
+Time of generation: 14-nov-2003 7:25:00
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="1067,51,1241,129" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj3'); setObjMenu('occ_obj3')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odd966688-bc25-4c83-8bb8-ecea2b5946c4', 'general')"href="odd966688-bc25-4c83-8bb8-ecea2b5946c4_inf.htm" alt="Name: Incident
+Record
+Description/Definition: Ein Record, der die Details zu einem Incident enthält. Jeder Incident Record dokumentiert den Lebenszyklus eines einzelnen Incident.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:56
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"630,266,650,286\" onmouseover=\"setMenu('occ4')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ4')\"/>");</script><area shape="rect" coords="453,186,627,264" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj4'); setObjMenu('occ_obj4')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'general')"href="ode184eb7-5bae-4348-82ae-a11fce0bb9cb_inf.htm" alt="Name: Problem Record
+Description/Definition: Ein Record, der die Details zu einem Problem enthält. Jeder Problem Record dokumentiert den Lebenszyklus eines einzelnen Problems.
+Time of generation: 14-nov-2003 7:13:17
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="78,366,252,444" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj5'); setObjMenu('occ_obj5')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9', 'general')"href="o6ca8bf3a-643a-4bd3-ac3f-4068b92793d9_inf.htm" alt="Name: Problem-
+Statusnachricht
+Time of generation: 31-oct-2003 7:55:47
+Last change: 09-ene-2008 9:19:34
+"/>
+<area shape="rect" coords="722,1085,896,1163" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj6'); setObjMenu('occ_obj6')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o9b069c6b-512a-11d6-8369-0004751947b0', 'general')"href="o9b069c6b-512a-11d6-8369-0004751947b0_inf.htm" alt="Name: Relevantes SLA
+Description/Definition: Die Service Level-Vereinbarungen, die für die jeweilige Situation (z. B. den aktuellen Incident) gelten.
+Time of generation: 16-abr-2002 8:01:45
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="1052,1505,1226,1583" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj7'); setObjMenu('occ_obj7')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8c0d9292-cead-4841-bdc3-5dbe45021fd4', 'general')"href="o8c0d9292-cead-4841-bdc3-5dbe45021fd4_inf.htm" alt="Name: Beschreibung der
+permanenten Lösung
+Description/Definition: Die Beschreibung einer Maßnahme oder einer Serie von Maßnahmen, mit denen ein Problem (voraussichtlich) dauerhaft behoben werden kann.
+Time of generation: 23-oct-2003 9:45:49
+Last change: 09-ene-2008 11:28:41
+"/>
+<area shape="rect" coords="1472,920,1646,998" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj8'); setObjMenu('occ_obj8')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('ofe049552-1f94-4529-8065-333cd036ac9b', 'general')"href="ofe049552-1f94-4529-8065-333cd036ac9b_inf.htm" alt="Name: Ausgesetzt
+Time of generation: 23-oct-2003 12:12:39
+Last change: 15-mar-2008 9:08:31
+"/>
+<area shape="rect" coords="1052,1415,1226,1493" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj9'); setObjMenu('occ_obj9')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed', 'general')"href="o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed_inf.htm" alt="Name: Workaround-
+Beschreibung
+Time of generation: 23-oct-2003 9:44:08
+Last change: 08-feb-2008 11:56:19
+"/>
+<area shape="rect" coords="1472,830,1646,908" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj10'); setObjMenu('occ_obj10')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6be00962-73e6-4dc3-b273-de6035f40747', 'general')"href="o6be00962-73e6-4dc3-b273-de6035f40747_inf.htm" alt="Name: Geschlossen
+Time of generation: 27-oct-2003 12:58:41
+Last change: 15-mar-2008 9:36:03
+"/>
+<area shape="rect" coords="1472,740,1646,818" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj11'); setObjMenu('occ_obj11')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442570-40d4-11d6-8351-0004751947b0', 'general')"href="of5442570-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Known Error
+Description/Definition: Ein Problem, für das die zugrunde liegende Ursache und ein Workaround dokumentiert wurden. Das Problem Management ist verantwortlich für die Erstellung und Verwaltung von bekannten Fehlern während ihres gesamten Lebenszyklus. Bekannte Fehler können auch von der Entwicklung oder den Suppliern identifiziert werden..
+Time of generation: 26-mar-2002 12:50:14
+Last change: 06-nov-2009 9:57:57
+"/>
+<area shape="rect" coords="1472,650,1646,728" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj12'); setObjMenu('occ_obj12')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o88544f80-a5b9-4e90-824a-fa53c5fa9e42', 'general')"href="o88544f80-a5b9-4e90-824a-fa53c5fa9e42_inf.htm" alt="Name: Offen
+Time of generation: 20-oct-2003 7:23:56
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="1172,1325,1346,1403" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj13'); setObjMenu('occ_obj13')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442572-40d4-11d6-8351-0004751947b0', 'general')"href="of5442572-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: SLA
+Description/Definition: (Service Level Vereinbarung)
+Eine Vereinbarung zwischen einem IT Service Provider und einem Kunden. Das SLA beschreibt den jeweiligen IT Service, dokumentiert Service Level Ziele und legt die Verantwortlichkeiten des IT Service Providers und des Kunden fest. Ein einzelnes SLA kann mehrere IT Services oder mehrere Kunden abdecken.
+Time of generation: 26-mar-2002 12:52:31
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="1532,1130,1706,1208" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj14'); setObjMenu('occ_obj14')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989', 'general')"href="o1a5362b7-a2a5-4d29-8d9f-e4ef4611b989_inf.htm" alt="Name: Serviceauswirkung
+Description/Definition: Die Serviceauswirkung wird ermittelt durch die Anzahl und Priorität der Incidents, die dem Problem- oder dem Known-Error-Record hinzugefügt wurden.
+Time of generation: 13-oct-2003 15:40:56
+Last change: 09-ene-2008 9:19:36
+"/>
+<area shape="rect" coords="1067,141,1241,219" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj15'); setObjMenu('occ_obj15')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o24ecb9c8-1620-49a5-8a63-8fbd490212c1', 'general')"href="o24ecb9c8-1620-49a5-8a63-8fbd490212c1_inf.htm" alt="Name: Configuration
+Item
+Description/Definition: Alle Komponenten, die verwaltet werden müssen, um einen IT Service bereitstellen zu können. Informationen zu den einzelnen CIs werden in einem Configuration Record innerhalb des Configuration Management Systems erfasst und über den gesamten Lebenszyklus hinweg vom Configuration Management verwaltet. CIs unterstehen der Steuerung und Kontrolle des Change Management. CIs umfassen vor allem IT Services, Hardware, Software, Gebäude, Personen und formale Dokumentationen, beispielsweise zum Prozess und SLAs.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 06-nov-2009 9:57:54
+"/>
+<area shape="rect" coords="677,188,821,262" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj16'); setObjMenu('occ_obj16')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4423847-2e09-4b37-9731-4b4d6fe8239e', 'general')"href="oc4423847-2e09-4b37-9731-4b4d6fe8239e_inf.htm" alt="Name: kann
+verknüpft sein mit
+Description/Definition: Diese Beziehungen werden automatisch erstellt.
+Time of generation: 13-oct-2003 10:58:28
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="722,995,896,1073" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj17'); setObjMenu('occ_obj17')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb', 'general')"href="o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb_inf.htm" alt="Name: Betroffener
+Service
+Description/Definition: Sollte aus dem Servicekatalog des aktuellen Kunden ausgewählt werden.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="722,1175,896,1253" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj18'); setObjMenu('occ_obj18')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o6f5db7e6-30ed-447a-9a9f-db82e7f24559', 'general')"href="o6f5db7e6-30ed-447a-9a9f-db82e7f24559_inf.htm" alt="Name: Aktions-
+protokoll
+Description/Definition: Die Auflistung aller Maßnahmen, die aufgrund eines bestimmten Incidents, eines bestimmten Problems, einer bestimmten Änderung usw. ergriffen wurden.
+Last change: 07-feb-2008 10:56:54
+"/>
+<area shape="rect" coords="1337,561,1511,639" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj19'); setObjMenu('occ_obj19')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o2161b041-c403-4106-81fa-26f7a98ba47f', 'general')"href="o2161b041-c403-4106-81fa-26f7a98ba47f_inf.htm" alt="Name: Problemstatus
+Description/Definition: z. B.
+-Offen
+-Geplant
+-Einem Experten zugeteilt bzw. an diesen weitergeleitet
+-Laufende Arbeit
+-Ausgesetzt
+-Geschlossen
+Time of generation: 10-oct-2003 13:40:41
+Last change: 15-mar-2008 9:50:33
+"/>
+<area shape="rect" coords="722,905,896,983" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj20'); setObjMenu('occ_obj20')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc1e2ff84-b7ac-444a-8b89-2f263ad918c0', 'general')"href="oc1e2ff84-b7ac-444a-8b89-2f263ad918c0_inf.htm" alt="Name: Problem-Symptom-
+beschreibung
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:03:00
+"/>
+<area shape="rect" coords="722,815,896,893" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj21'); setObjMenu('occ_obj21')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o53aebb85-96f3-4626-9a16-22c3a7974e0e', 'general')"href="o53aebb85-96f3-4626-9a16-22c3a7974e0e_inf.htm" alt="Name: Bearbeitender
+Mitarbeiter
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:41
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="722,725,896,803" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj22'); setObjMenu('occ_obj22')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o8ee9cf22-8cdc-4981-a9b9-484151c85960', 'general')"href="o8ee9cf22-8cdc-4981-a9b9-484151c85960_inf.htm" alt="Name: Erstelldatum
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:02:59
+"/>
+<area shape="rect" coords="573,488,717,562" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj23'); setObjMenu('occ_obj23')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e', 'general')"href="o91c8c404-0d79-4fc0-9bb3-72872a0dbb2e_inf.htm" alt="Name: enthält
+Time of generation: 28-oct-2003 12:18:01
+Last change: 07-feb-2008 11:01:14
+"/>
+<area shape="rect" coords="1052,635,1226,713" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj24'); setObjMenu('occ_obj24')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c', 'general')"href="oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c_inf.htm" alt="Name: Problemtyp
+Description/Definition: z. B. Software
+  - Office-Anwendung
+  - Business-Anwendung
+ Hardware 
+  - EDV-Anlage
+  - Großrechner
+  - Arbeitsplatzrechner
+Time of generation: 10-oct-2003 13:40:40
+Last change: 07-feb-2008 11:00:35
+"/>
+<area shape="rect" coords="722,635,896,713" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj25'); setObjMenu('occ_obj25')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('oa241dadd-8de6-425e-968d-469da84b42c1', 'general')"href="oa241dadd-8de6-425e-968d-469da84b42c1_inf.htm" alt="Name: Problem Record ID
+Description/Definition: Diese Informationen werden automatisch erfasst.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 09-ene-2008 9:19:33
+"/>
+<area shape="rect" coords="1172,740,1346,818" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj26'); setObjMenu('occ_obj26')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('obceefcd5-cbac-4ba1-ba9a-061bb77d16d9', 'general')"href="obceefcd5-cbac-4ba1-ba9a-061bb77d16d9_inf.htm" alt="Name: Live-Problem
+Description/Definition: Ein Problem, das in der realen betrieblichen Infrastruktur auftritt.
+Time of generation: 20-oct-2003 7:22:21
+Last change: 07-feb-2008 11:00:34
+"/>
+<area shape="rect" coords="1172,830,1346,908" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj27'); setObjMenu('occ_obj27')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o48d3c0d7-8d98-4db8-8562-6ab1c767f879', 'general')"href="o48d3c0d7-8d98-4db8-8562-6ab1c767f879_inf.htm" alt="Name: Entwicklungs-
+problem
+Description/Definition: Ein Problem, das in anderen Prozessen erkannt wurde (z. B. während der Anwendungsentwicklung), jedoch nicht im realen betrieblichen Umfeld auftritt.
+Time of generation: 20-oct-2003 7:22:32
+Last change: 07-feb-2008 11:00:33
+"/>
+<script>document.write("<area shape=\"rect\" coords=\"255,266,275,286\" onmouseover=\"setMenu('occ28')\" onmouseout=\"setMenu('general')\"onclick=\"setHasToHide('false'); loadPages('null', 'occ28')\"/>");</script><area shape="rect" coords="78,186,252,264" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj28'); setObjMenu('occ_obj28')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68', 'general')"href="o285a46e2-7bb1-4bbb-ad68-fe0ab43eea68_inf.htm" alt="Name: Problem
+Description/Definition: Die Ursache für einen oder mehrere Incidents. Zum Zeitpunkt der Erstellung eines Problem Record ist die Ursache in der Regel unbekannt. Für die weitere Untersuchung ist der Problem Management Prozess verantwortlich.
+Time of generation: 10-oct-2003 13:40:42
+Last change: 06-nov-2009 9:57:56
+"/>
+<area shape="rect" coords="1172,1235,1346,1313" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj29'); setObjMenu('occ_obj29')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('odb12bae4-ef05-4386-b745-7944e21bf9c8', 'general')"href="odb12bae4-ef05-4386-b745-7944e21bf9c8_inf.htm" alt="Name: Dringlichkeit
+Description/Definition: Ein Wert, der wiedergibt, wie lange es dauert, bis ein Incident, Problem oder Change maßgebliche Auswirkungen auf das Business hat. Ein Incident mit erheblichen Auswirkungen kann beispielsweise von geringer Dringlichkeit sein, wenn die Auswirkungen das Business bis zum Ende des Geschäftsjahrs nicht beeinträchtigen. Auf der Grundlage der Auswirkung und Dringlichkeit werden Prioritäten zugewiesen.
+Time of generation: 10-oct-2003 13:02:42
+Last change: 09-ene-2008 11:28:43
+"/>
+<area shape="rect" coords="1172,1145,1346,1223" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj30'); setObjMenu('occ_obj30')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('of5442553-40d4-11d6-8351-0004751947b0', 'general')"href="of5442553-40d4-11d6-8351-0004751947b0_inf.htm" alt="Name: Impact
+Description/Definition: Maß dafür, wie geschäftskritisch ein Incident, ein Problem oder ein Änderungsantrag für ein Unternehmen ist. Kann oftmals gleichgesetzt werden mit der Abweichung von vereinbarten oder erwarteten Service Levels.
+Time of generation: 26-mar-2002 12:20:41
+Last change: 24-sep-2008 4:04:45
+"/>
+<area shape="rect" coords="1052,935,1226,1013" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj31'); setObjMenu('occ_obj31')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o5cee9abb-dde2-43d4-afae-45b62c82e62b', 'general')"href="o5cee9abb-dde2-43d4-afae-45b62c82e62b_inf.htm" alt="Name: Problem-
+kategorie
+Description/Definition: Beispielkategorien für Probleme:
+- Software 
+-Textverarbeitung
+-Tabellenkalkulation
+-Business-Anwendung
+- Hardware 
+-EDV-Anlage
+-Großrechner
+-Arbeitsplatzrechner
+Time of generation: 29-oct-2003 7:30:55
+Last change: 06-nov-2009 9:57:55
+"/>
+<area shape="rect" coords="1052,1040,1226,1118" onmouseover="setModelInfoToShow('false'); setMenu('occ_obj32'); setObjMenu('occ_obj32')" onmouseout="setModelInfoToShow('true'); setMenu('general')" onclick="loadObjectPage('o70893700-d5be-4179-8ce5-a9b7b16e2164', 'general')"href="o70893700-d5be-4179-8ce5-a9b7b16e2164_inf.htm" alt="Name: Problem-
+priorität
+Description/Definition: Reihenfolge, in der ein Problem gelöst werden muss. Dabei sollten Probleme, die zu ernsthaften Störungen von betrieblichen Abläufen führen können, vorrangig gelöst werden.
+Time of generation: 10-oct-2003 13:40:40
+Last change: 06-nov-2009 9:57:57
+"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</map>
+
+
+
+
+
+</div>
+
+<div id="printFunctions" class="menu" style="visibility:hidden; left:-1000; top: -1000"> 
+	<table width="120%">
+    	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showPrintFunctions()" onclick="Print(false, 'printFunctions')"><script>document.write(properties[selectedLangTag]['wp_standard_print']);</script></td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showPrintFunctions()"" onclick="Print(true, 'printFunctions')"><script>document.write(properties[selectedLangTag]['wp_page_print']);</script> </td>
+    	</tr>
+        </table>
+</div>
+
+<div id="zoomFunctions" class="menu" style="visibility:hidden; left:-1000; top: -1000"> 
+	<table width="120%">
+    	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(0, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomin']);</script></td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(1, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomout']);</script> </td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(2, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomhund']);</script> </td>
+    	</tr>
+	<tr>
+    	<td onmouseout="this.className=''" onmouseover="this.className='highlight'; showZoomFunctions()" onclick="Zoom(3, 'zoomFunctions')"><script>document.write(properties[selectedLangTag]['wp_mini_zoomopt']);</script> </td>
+    	</tr>
+        </table>
+</div>
+
+
+
+
+<div class="doc" id="imageDiv" > 
+<img id="mb2647529-d7ef-4813-8b87-6db7f3de731e" src="mb2647529-d7ef-4813-8b87-6db7f3de731e_100.png" onclick="loadModelPage('mb2647529-d7ef-4813-8b87-6db7f3de731e', 'general')" usemap="#ObjectMap100"></img>
+
+</div>
+
+</div>
+
+<div id="modLinks" class="doc"> 
+<MODEL LINKS>
+</div>
+
+<div id="print" >
+</div>
+
+</body>
+</html>

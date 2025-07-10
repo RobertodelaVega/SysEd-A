@@ -1,0 +1,207 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>Business Publisher</title>
+	<link rel="STYLESHEET" type="text/css" href="styles.css">
+	<script src="properties.js"></script>
+	<script src="exportedObjects.js"></script>
+	<script src="exportedModels.js"></script>
+<script>
+var selectedLangTag = "es";
+
+function JS_List_Jump(){
+	document.location.href=document.frm.cbo.options[document.frm.cbo.selectedIndex].value;
+}
+
+
+
+function loadObjectPages(url, target) {
+	if (searchObject(url) == false) {
+		alert(properties[selectedLangTag]['wp_objectNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+
+function loadModelPages(url, target) {
+	if (searchModel(url) == false) {
+		alert(properties[selectedLangTag]['wp_modelNotExported']);
+	}
+        else {
+		if (target == "model") {
+			top.model.location.href=url + "_nav.htm";
+		}
+		else if (target == "info") {
+			top.info.location.href=url + "_inf.htm";
+		}
+		else if (target == "data") {
+			top.data.location.href=url + "_gfx.htm";
+		}
+		
+	}		
+		
+}
+
+</script>
+</head>
+<body  bgcolor='#FFFFFF'>
+
+<p class="name">&nbsp;<script>document.write(properties[selectedLangTag]['wp_object']);</script></p>
+
+<div id="auswahl"><font face="Arial">
+	<form name="frm" action="#none" method="POST"><table><tr><td valign="middle">
+		<select name="cbo" onChange="javascript: JS_List_Jump(); return true;">
+		<option value="#Attributes"><script>document.write(properties[selectedLangTag]['wp_attributes']);</script></option>
+		<option value="#Feedback"><script>document.write(properties[selectedLangTag]['wp_feedback']);</script></option>
+		<option value="#Occurrences"><script>document.write(properties[selectedLangTag]['wp_occurrences']);</script></option>
+		<option value="#Hierarchy"><script>document.write(properties[selectedLangTag]['wp_assignments']);</script></option>
+		<option value="#Relationships"><script>document.write(properties[selectedLangTag]['wp_relationships']);</script></option>
+		<option value="#Master"><script>document.write(properties[selectedLangTag]['wp_master']);</script></option>
+		<option value="#Variants"><script>document.write(properties[selectedLangTag]['wp_variants']);</script></option></select>
+        </td></tr></table></form></font>
+</div>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Attributes"></a>&nbsp;<b><script>document.write(properties['es']['wp_attributes']);</script></b></th>
+</tr>
+<tr>
+	<td>Creator</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Last change</td>
+	<td>07-feb-2008 11:01:14</td>
+</tr>
+<tr>
+	<td>Last user</td>
+	<td>system</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>enthält</td>
+</tr>
+<tr>
+	<td>Time of generation</td>
+	<td>28-oct-2003 12:18:01</td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+</table>
+
+<ARIS OBJ_INF_FEEDBACK>
+<ARIS OBJ_INF_HIERARCHY>
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Occurrences"></a>&nbsp;<b><script>document.write(properties['es']['wp_occurrences']);</script></b></th>
+</tr>
+<tr>
+	<td>Technical terms model</td>
+	<td><a href="mb2647529-d7ef-4813-8b87-6db7f3de731e_nav.htm" target="model">Problem (Record)</a></td>
+</tr>
+<ARIS LIST>
+
+</table>
+
+<table class="dataTable">
+<tr>
+	<th colspan="2"><a name="Relationships"></a>&nbsp;<b><script>document.write(properties['es']['wp_relationships']);</script></b></th>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o6f5db7e6-30ed-447a-9a9f-db82e7f24559', 'info')">Aktionsprotokoll</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o2161b041-c403-4106-81fa-26f7a98ba47f', 'info')">Problemstatus</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o5cee9abb-dde2-43d4-afae-45b62c82e62b', 'info')">Problemkategorie</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o8ee9cf22-8cdc-4981-a9b9-484151c85960', 'info')">Erstelldatum</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('oc1e2ff84-b7ac-444a-8b89-2f263ad918c0', 'info')">Problem-Symptombeschreibung</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('oa241dadd-8de6-425e-968d-469da84b42c1', 'info')">Problem Record ID</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o2292c351-fbea-40a4-8cc7-1ed9aa4bcbdb', 'info')">Betroffener Service</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o9b069c6b-512a-11d6-8369-0004751947b0', 'info')">Relevantes SLA</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o53aebb85-96f3-4626-9a16-22c3a7974e0e', 'info')">Bearbeitender Mitarbeiter</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o8c0d9292-cead-4841-bdc3-5dbe45021fd4', 'info')">Beschreibung der permanenten Lösung</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o3c91afa0-dae9-4d1e-b4d6-9983c5c325ed', 'info')">Workaround-Beschreibung</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('oc4c9f3a7-97b5-4c8d-a7e6-75a47bc5e13c', 'info')">Problemtyp</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('ode184eb7-5bae-4348-82ae-a11fce0bb9cb', 'info')">Problem Record</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o70893700-d5be-4179-8ce5-a9b7b16e2164', 'info')">Problempriorität</a></td>
+</tr>
+<tr>
+	<td>is depicted by</td>
+	<td><a href="javascript:loadObjectPages('o03b84233-510c-11d6-8368-0004751947b0', 'info')">Schließungsdatum</a></td>
+</tr>
+<ARIS LIST>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+
+<ARIS OBJ_INF_MASTER>
+<ARIS OBJ_INF_VARIANTS>
+
+</body>
+</html>
